@@ -1,0 +1,442 @@
+/* 
+  style.css contains a reset, font normalization and some base styles.
+  
+  credit is left where credit is due.
+  additionally, much inspiration was taken from these projects:
+    yui.yahooapis.com/2.8.1/build/base/base.css
+    camendesign.com/design/
+    praegnanz.de/weblog/htmlcssjs-kickstart
+*/
+
+/* 
+  html5doctor.com Reset Stylesheet (Eric Meyer's Reset Reloaded + HTML5 baseline)
+  v1.4 2009-07-27 | Authors: Eric Meyer & Richard Clark
+  html5doctor.com/html-5-reset-stylesheet/
+*/
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, figure, footer, header, 
+hgroup, menu, nav, section, menu,
+time, mark, audio, video {
+  margin:0;
+  padding:0;
+  border:0;
+  outline:0;
+  font-size:100%;
+  vertical-align:baseline;
+  background:transparent;
+}                  
+
+article, aside, figure, footer, header, 
+hgroup, nav, section { display:block; }
+
+nav ul { list-style:none; }
+
+blockquote, q { quotes:none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after { content:''; content:none; }
+
+a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
+
+ins { background-color:#ff9; color:#000; text-decoration:none; }
+
+mark { background-color:#ff9; color:#000; font-style:italic; font-weight:bold; }
+
+del { text-decoration: line-through; }
+
+abbr[title], dfn[title] { border-bottom:1px dotted #000; cursor:help; }
+
+/* tables still need cellspacing="0" in the markup */
+table { border-collapse:collapse; border-spacing:0; }
+
+hr { display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 0; padding:0; }
+
+input, select { vertical-align:middle; }
+/* END RESET CSS */
+
+
+/* normalize monospace sizing 
+ * en.wikipedia.org/wiki/MediaWiki_talk:Common.css/Archive_11#Teletype_style_fix_for_Chrome
+ */
+pre, code, kbd, samp { font-family: monospace, sans-serif; }
+
+/* www.aestheticallyloyal.com/public/optimize-legibility/ */ 
+h1,h2,h3,h4,h5,h6 { font-weight: bold; text-rendering: optimizeLegibility; }
+
+/* maxvoltar.com/archive/-webkit-font-smoothing */
+html { -webkit-font-smoothing: antialiased; }
+
+ 
+/* Accessible focus treatment: people.opera.com/patrickl/experiments/keyboard/test */
+a:hover, a:active { outline: none; }
+
+a, a:active, a:visited { color:#607890; }
+a:hover { color:#036; }
+
+
+ul { margin-left:30px; }
+ol { margin-left:30px; list-style-type: decimal; }
+
+small { font-size:85%; }
+strong, th { font-weight: bold; }
+
+table {
+    height: 100%;
+    width: 100%;
+    border-collapse: collapse;
+}
+td {
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+}
+
+sub { vertical-align: sub; font-size: smaller; }
+sup { vertical-align: super; font-size: smaller; }
+
+pre { 
+  padding: 15px; 
+  
+  /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
+  white-space: pre; /* CSS2 */
+  white-space: pre-wrap; /* CSS 2.1 */
+  white-space: pre-line; /* CSS 3 (and 2.1 as well, actually) */
+  word-wrap: break-word; /* IE */
+}
+
+/* align checkboxes, radios, text inputs with their label
+   by: Thierry Koblentz tjkdesign.com/ez-css/css/base.css  */
+input[type="radio"] { vertical-align: text-bottom; }
+input[type="checkbox"] { vertical-align: bottom; *vertical-align: baseline; }
+.ie6 input { vertical-align: text-bottom; }
+
+/* hand cursor on clickable input elements */
+label, input[type=button], input[type=submit], button { cursor: pointer; }
+
+
+/* These selection declarations have to be separate.
+   No text-shadow: twitter.com/miketaylr/status/12228805301 
+   Also: hot pink. */
+::-moz-selection{ background: #FF5E99; color:#fff; text-shadow: none; }
+::selection { background:#FF5E99; color:#fff; text-shadow: none; } 
+
+/*  j.mp/webkit-tap-highlight-color */
+a:link { -webkit-tap-highlight-color: #FF5E99; } 
+
+
+/* Hide for both screenreaders and browsers
+   css-discuss.incutio.com/wiki/Screenreader_Visibility */
+.hidden { display:none; visibility:hidden; } 
+
+
+ /* Primary Styles
+    Author: Pool 10
+ */
+#close {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5em;
+	font-size: 150%;
+}
+html, body, #container {
+    /* overflow:hidden; */
+}
+
+#container {
+    height: 100%;
+}
+
+body {
+    background: #333;
+    color: #fff;
+    font:1.2em/1.2 helvetica, arial, sans-serif;
+    font-weight: bold;
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+body.show-controls {
+    background:#333 !important;
+    -webkit-transition-property: color, background; 
+	-webkit-transition-duration: 1s, 1s; 
+	-webkit-transition-timing-function: linear, ease-in;
+}
+
+/* Room is free - white on green */
+body.status-free {
+    background:#319900;
+    -webkit-transition-property: color, background; 
+	-webkit-transition-duration: 1s, 1s; 
+	-webkit-transition-timing-function: linear, ease-in;
+}
+body.status-free #status {
+    color: #fff;   
+}
+body.status-free #minutes-free span {
+    display: none;
+}
+body.status-free #minutes-free:after {
+	content: "✓";
+}
+
+/* Meeting ending soon - black on yellow */
+body.status-soon ,
+body.freetime-inadequate {
+    background: #ffce00;
+    -webkit-transition-property: color, background; 
+	-webkit-transition-duration: 1s, 1s; 
+	-webkit-transition-timing-function: linear, ease-in;
+}
+body.status-soon #status,
+body.freetime-inadequate #status {
+    color: #000;
+}
+/* Booked solid - white on red */
+body.status-busy {
+    background: #e50000; /* red */
+    -webkit-transition-property: color, background; 
+	-webkit-transition-duration: 1s, 1s; 
+	-webkit-transition-timing-function: linear, ease-in;
+}
+body.status-busy #status {
+    color: #fff;
+}
+/* --- */
+
+#status {
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    position: relative;
+    height: 100%;
+}
+
+#next-event {
+    padding-left: 20%;
+    text-align: left;
+}
+#next-event > h2, #next-event > h3 {
+    padding-bottom: 0.5em;
+}
+#next-event > h3 {
+    /* padding-left: 1em;*/
+}
+
+#controls {
+
+}
+#controls p {
+    font-size:2em;
+    margin-bottom: 0.65em;
+}
+#controls #time,
+#controls #time li {
+    margin:0;
+    padding:0;
+    list-style:none;   
+}
+#controls #time li {
+    cursor: pointer;
+    display:inline-block;
+    font-size:4em;
+    font-weight: bold;
+    margin:0 0.3em;
+    line-height:2em;  
+    background:rgba(255,255,255,0.9);
+    color:#222; 
+}
+
+#controls #time li.time-adjust {
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
+    font-size:2em;
+    height:2em;
+    width:2em; 
+}
+#controls #time li.time-adjust.disabled {
+    background:rgba(255,255,255,0.3);
+}
+#controls #time li#time-required {
+    vertical-align: middle;
+    -webkit-border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+    border-radius: 0.2em;
+    padding: 0.125em 0.25em 0;
+    line-height: 1.4;
+    
+}
+#info {
+    line-height: 1;
+}
+
+#info p {
+    color: #fff;
+    font-size:2em;
+    padding: 1em;
+    margin: 1em 0;
+
+}
+
+#info p:first-of-type strong {
+    display: block;
+    font-size: 200%;
+    margin-top: 0.1em;
+}
+
+
+
+
+
+
+#booking {
+    display: none;
+}
+#booking td {
+    height: 50%;
+}
+
+
+
+/* non-table table CSS 
+
+#booking {
+    display: table;
+    width: 100%;
+}
+#booking .row {
+    display: table-row;   
+}
+#booking #p1,
+#booking #p2 {
+    display: table-cell;
+    vertical-align:middle; 
+    text-align:center;  
+}
+
+*/
+
+
+
+/* Rooms */
+body.rooms {
+
+}
+#rooms {
+    display:none;
+    text-align:center;
+}
+
+#rooms-list,
+#rooms-list li {
+    margin:0;
+    padding:0;
+    list-style:none;  
+
+}
+#rooms-list li {
+    text-align: left;
+    font-size: 3em;
+    margin: 0.4em 0.6em 0.4em 0.4em;
+    padding: 0.2em;
+    -webkit-border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+    border-radius: 0.2em;
+	cursor: pointer;
+}
+#rooms-list li.status-free {
+    background: #319900;  
+}
+#rooms-list li.status-soon,
+#rooms-list li.freetime-inadequate {
+    background: #ffce00;  
+    color: #222;
+}
+#rooms-list li.status-busy {
+    background: #e50000;  
+}
+
+
+#rooms-list li em,
+#rooms-list li span {
+    margin-right: 0.5em;
+    min-width: 1.5em;
+    text-align: right;
+    
+}
+
+#rooms-list li em {
+    display: none;
+    font-style: normal;
+}
+
+#rooms-list li span {
+    display: inline-block;
+}
+#rooms-list li em {
+    display: none;
+    font-style: normal;
+}
+#rooms-list li.status-free span {
+    display: none;
+}
+#rooms-list li.status-free em {
+    display: inline-block;
+}
+
+/*
+ * Media queries for responsive design
+ */
+
+@media all and (orientation:portrait) { 
+  /* Style adjustments for portrait mode goes here */
+  
+}
+
+@media all and (orientation:landscape) { 
+  /* Style adjustments for landscape mode goes here */
+  
+}
+
+/* Grade-A Mobile Browsers (Opera Mobile, iPhone Safari, Android Chrome)  
+   Consider this: www.cloudfour.com/css-media-query-for-mobile-is-fools-gold/ */
+@media screen and (max-device-width: 480px) {
+    
+    
+#info p,
+#controls p {
+    font-size: 1.5em;
+}
+
+#controls #time li.time-adjust {
+    font-size:1.5em;
+}
+
+#controls #time li#time-required {
+    font-size:3em;
+}    
+
+#close {
+    top: 1em;
+}
+
+#rooms-list li {
+    font-size:1.5em;    
+}
+  
+  
+  /* Prevent iOS, WinMobile from adjusting font size */
+  html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; } 
+}
+
