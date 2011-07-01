@@ -1,4 +1,9 @@
 var EventManagerConfig = {
+
+	/*
+		The gApps domain to 
+	*/
+	appDomain : "atlassian.com",
 	/*
 		Either:
 			- null/undefined/falsy to list ALL rooms,

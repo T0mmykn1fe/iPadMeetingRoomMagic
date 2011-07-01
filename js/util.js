@@ -23,7 +23,8 @@ var Logger = (function(){
 
 	return {
 		log: function(msg, errObj) {
-			console.log(msg + (errObj ? '\n' + errObj : ''));
+			msg && console.log(msg);
+			errObj && setTimeout(function() { throw errObj; }, 0);
 
             if (DebugSettings.logServer) {
 
@@ -126,7 +127,7 @@ var DebugSettings = (function(){
 	
 	return {
 		now : vars.debug ?
-				function() { return new Date(2010, 10, 3, 9, 45, 0); } :
+				function() { return new Date(2011, 6, 1, 15, 25, 0); } :
 				function() {}
 	};
 })();

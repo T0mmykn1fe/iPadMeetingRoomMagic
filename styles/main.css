@@ -1,4 +1,4 @@
-/* 
+﻿/* 
   style.css contains a reset, font normalization and some base styles.
   
   credit is left where credit is due.
@@ -149,11 +149,11 @@ a:link { -webkit-tap-highlight-color: #FF5E99; }
     padding: 0.5em;
 	font-size: 150%;
 }
-html, body, #container {
-    /* overflow:hidden; */
-}
 
-#container {
+html,
+body,
+#container,
+#container > * {
     height: 100%;
 }
 
@@ -166,50 +166,67 @@ body {
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
-body.show-controls {
-    background:#333 !important;
+@-webkit-keyframes rotate {
+	from {
+	-webkit-transform: rotate(0deg);
+	}
+	to { 
+		-webkit-transform: rotate(360deg);
+	}
+}
+.loading #loading {
+	-webkit-animation-name:             rotate; 
+	-webkit-animation-duration:         0.5s; 
+	-webkit-animation-iteration-count:  infinite;
+	-webkit-animation-timing-function: linear;
+	
+	margin: 2em auto 0;
+	font-size: 10em;
+	width: 1em;
+	height: 1em;
+}
+.loading #status,
+.loading #booking,
+.loading #rooms {
+	display: none;
+}
+
+.show-status #loading,
+.show-status #booking,
+.show-status #rooms {
+	display : none;
+}
+.show-booking #loading,
+.show-booking #status,
+.show-booking #rooms {
+	display : none;
+}
+.show-rooms #loading,
+.show-rooms #status,
+.show-rooms #booking {
+	display : none;
+}
+
+#container {
     -webkit-transition-property: color, background; 
 	-webkit-transition-duration: 1s, 1s; 
 	-webkit-transition-timing-function: linear, ease-in;
 }
 
 /* Room is free - white on green */
-body.status-free {
+.show-status > #container.status-free {
     background:#319900;
-    -webkit-transition-property: color, background; 
-	-webkit-transition-duration: 1s, 1s; 
-	-webkit-transition-timing-function: linear, ease-in;
+    color: #fff;
 }
-body.status-free #status {
-    color: #fff;   
-}
-body.status-free #minutes-free span {
-    display: none;
-}
-body.status-free #minutes-free:after {
-	content: "✓";
-}
-
 /* Meeting ending soon - black on yellow */
-body.status-soon ,
-body.freetime-inadequate {
+.show-status > #container.status-soon ,
+.show-status > #container.freetime-inadequate {
     background: #ffce00;
-    -webkit-transition-property: color, background; 
-	-webkit-transition-duration: 1s, 1s; 
-	-webkit-transition-timing-function: linear, ease-in;
-}
-body.status-soon #status,
-body.freetime-inadequate #status {
     color: #000;
 }
 /* Booked solid - white on red */
-body.status-busy {
+.show-status > #container.status-busy {
     background: #e50000; /* red */
-    -webkit-transition-property: color, background; 
-	-webkit-transition-duration: 1s, 1s; 
-	-webkit-transition-timing-function: linear, ease-in;
-}
-body.status-busy #status {
     color: #fff;
 }
 /* --- */
@@ -219,18 +236,44 @@ body.status-busy #status {
     text-align: center;
     line-height: 1;
     position: relative;
-    height: 100%;
 }
 
-#next-event {
-    padding-left: 20%;
-    text-align: left;
+#container #minutes-free:after {
+	content: "✘";
 }
-#next-event > h2, #next-event > h3 {
-    padding-bottom: 0.5em;
+#container.status-free #minutes-free:after {
+	content: "✓";
 }
-#next-event > h3 {
-    /* padding-left: 1em;*/
+
+.events {
+	position: absolute;
+	bottom : 0;
+	width: 100%;
+}
+.event {
+	font-size: 2em;
+    text-align: center;
+	padding: 0 2.5em 2.5em;
+}
+
+.event > .which {
+	font-size: 0.6em;
+	padding-bottom: 4px;
+}
+.event > .title,
+.event > .organizer ,
+.event > .when {
+	font-weight: normal;
+    padding: 6px 0.5em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.event > .title {
+	font-weight: bold;
+}
+.event > .organizer {
+	font-style: italic;
 }
 
 #controls {
@@ -295,65 +338,32 @@ body.status-busy #status {
     margin-top: 0.1em;
 }
 
-
-
-
-
-
-#booking {
-    display: none;
-}
 #booking td {
     height: 50%;
 }
 
-
-
-/* non-table table CSS 
-
-#booking {
-    display: table;
-    width: 100%;
-}
-#booking .row {
-    display: table-row;   
-}
-#booking #p1,
-#booking #p2 {
-    display: table-cell;
-    vertical-align:middle; 
-    text-align:center;  
-}
-
-*/
-
-
-
 /* Rooms */
-body.rooms {
-
-}
 #rooms {
-    display:none;
     text-align:center;
 }
 
-#rooms-list,
-#rooms-list li {
-    margin:0;
-    padding:0;
+#rooms-list {
+	font-size: 3em;
+    padding: 0.4em 0;
     list-style:none;  
 
 }
 #rooms-list li {
     text-align: left;
-    font-size: 3em;
     margin: 0.4em 0.6em 0.4em 0.4em;
     padding: 0.2em;
     -webkit-border-radius: 0.2em;
     -moz-border-radius: 0.2em;
     border-radius: 0.2em;
 	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: clip;
 }
 #rooms-list li.status-free {
     background: #319900;  
@@ -388,11 +398,11 @@ body.rooms {
     display: none;
     font-style: normal;
 }
-#rooms-list li.status-free span {
-    display: none;
+#rooms-list li strong:before {
+    content: "✘";
 }
-#rooms-list li.status-free em {
-    display: inline-block;
+#rooms-list li.status-free strong:before {
+    content: "✓";
 }
 
 /*
@@ -401,11 +411,39 @@ body.rooms {
 
 @media all and (orientation:portrait) { 
   /* Style adjustments for portrait mode goes here */
-  
+	#minutes-free  {
+		font-size: 14em;
+	}
+	.no-events #minutes-free {
+		padding-top: 0.2em;
+		font-size: 40em;
+	}
 }
 
 @media all and (orientation:landscape) { 
   /* Style adjustments for landscape mode goes here */
+	#minutes-free  {
+		font-size: 17em;
+	}
+	.no-events #minutes-free {
+		padding-top: 0.2em;
+		font-size: 30em;
+	}
+	
+	.event {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		display: inline-block;
+		width: 50%;
+		font-size: 2.5em;
+	}
+	.event:first-child  {
+		padding: 0 0.25em 1.2em 1em;
+	}
+	.event:last-child {
+		padding: 0 1em 1.2em 0.25em;
+	}
   
 }
 

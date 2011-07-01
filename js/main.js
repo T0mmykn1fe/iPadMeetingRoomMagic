@@ -18,7 +18,7 @@
 	} else {
 		var locationStr =
 			window.location.protocol + '//' + window.location.host + window.location.pathname;
-		$('#count')
+		$('#loading')
 			.css('font-size','18px')
 			.text('You must enter a room name in the url in the form "' + locationStr + '?room={room name}"')
 			.show();
