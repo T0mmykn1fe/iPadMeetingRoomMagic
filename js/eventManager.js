@@ -109,7 +109,7 @@ var EventManager = (function() {
 		},
 		includesRoom : function(roomName) {
 			return _.any(this._rooms, function(room) {
-				if (room.valueString === roomName && room.getAttendeeStatus().getValue() === google.gdata.AttendeeStatus.VALUE_ACCEPTED) {
+				if (room.valueString === roomName && room.getAttendeeStatus() && room.getAttendeeStatus().getValue() === google.gdata.AttendeeStatus.VALUE_ACCEPTED) {
 					return true;
 				}
 			});

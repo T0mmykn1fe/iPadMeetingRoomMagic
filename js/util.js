@@ -1,3 +1,19 @@
+var GlobalEvents = (function() {
+	var eventNamespace = ".meatevent";	
+	return {
+		trigger : function(a,b) {
+			$(window).trigger(a + eventNamespace, b);
+		},
+		bind : function(a,b,c) {
+			var newA;
+			$(window).bind(a + eventNamespace, b, c);
+		},
+		unbind : function(a,b) {
+			$(window).unbind(a + eventNamespace, b);
+		}
+	};
+})();
+
 var ParameterParser = new (function() {
 	this.parse = function() {
 		var hashTag = window.location.hash.substr(1),
@@ -24,7 +40,7 @@ var Logger = (function(){
 	return {
 		log: function(msg, errObj) {
 			msg && console.log(msg);
-			errObj && setTimeout(function() { throw errObj; }, 0);
+			throw errObj;
 
             if (DebugSettings.logServer) {
 

@@ -1,208 +1,312 @@
 // ui js 
 
-var displayFreeTime = false;
+function initUi(thisRoom) {	
+	
+	function coalesce(a,b) { return a == null ? b : a; }
+	var bookingParams = EventManagerConfig.bookingParameters || {};
+	var maxBookableMinutes = 			coalesce(bookingParams.maxBookableMinutes, 60),
+		minBookableMinutes = 			coalesce(bookingParams.minBookableMinutes, 5),
+		maxStatusSoonMinutes = 			coalesce(bookingParams.maxStatusSoonMinutes, 0),
+		minFreeTimeAdequateMinutes = 	coalesce(bookingParams.minFreeTimeAdequateMinutes, 0),
+		defaultTimeBlock = 				coalesce(bookingParams.defaultBookingMinutes, 30),
+		timeInterval = 					coalesce(bookingParams.bookingIntervalMinutes, 15),
+		idleTimeoutSec = 				coalesce(EventManagerConfig.idleTimeoutSeconds, 30);
+	
+	var ViewModels = (function() {
 
-//this only happens once we have data ready.
-function initUi(thisRoom) {
-	var $body = $('body'),
-            $close = $('#close'),
-            $container = $("#container"),
-				$booking = $('#booking'),
-				$rooms = $('#rooms'),
-					$roomsList = $('#rooms-list');
+		function minutesBetween(a, b) {
+			return Math.ceil((b.getTime() - a.getTime()) / 60000);
+		}
 	
-	var msPerSec = 1000,
-		msPerMin = 1000 * 60,
-		msPerHour = 1000 * 60 * 60,
-		msPerDay = 1000 * 60 * 60 * 24,
-		minPerDay = 60 * 24;
-	
-	var maxBookableMinutes = 60,
-		minBookableMinutes = 5,
-		maxStatusSoonMinutes = 0,
-		minFreeTimeAdequateMinutes = 30,
-		idleTimeoutSec = 30;
-		
-    var defaultTimeBlock = 30,
-		timeInterval = 15;
-	
-	var ViewModels = {
-		thisRoom : (function() {
-			var room;
-			return {
-				getRoom : function() { return room; },
-				getRoomStatusClassString : function() {
-					var availability = getRoomAvailability(room);
-					return getStatusClassString(availability.minutesTilFree, availability.minutesFreeFor);
-				},
-				getCurrentBooking : function() {
-					var currentBooking = getRoomAvailability(room).currentBooking;
-					if (currentBooking) {
-						currentBooking.when = "for " + currentBooking.minutesTilEnd + " more mins";
-					}
-					return currentBooking;
-				},
-				getNextBooking : function() {
-					var nextBooking = getRoomAvailability(room).nextBooking;
-					if (nextBooking && nextBooking.minutesTilStart) {
-						nextBooking.when = "in " + nextBooking.minutesTilStart + " mins";
-					}
-					return nextBooking;
-				},
-				setRoom : function(theRoom) {
-					room = theRoom;
-				},
-				sync : function() {}
-			};
-		})(),
-		otherRooms : (function() {
-			var onLoad = [],
-				rows = [];
-			
-			function htmlEscape(str) {
-				return str ? str.replace(/'"`<>/g, function(c) {
-					switch(c) {
-						case "'": return "&apos;";
-						case '"': return "&quot;";
-						case "`": return "&apos;";
-						case "<": return "&lt;";
-						case ">": return "&gt;";
-						default: return "&#" + c.charCodeAt(0) + ";";
-					}
-				}) : str;
+		function timeBetweenString(a, b, prefix) {
+			if (!a || !b) {
+				return "";
 			}
 			
-			var self;
-			return self = {
-				subscribeToNewRooms : function(func) {
-					onLoad.push(func);
-				},
-				createRoomRowViewModel : function(room) {
-					var model = {
-							sync : function() {},
-							getHtmlId : function() { return htmlEscape(room.id()); },
-							getDisplayName : function() { return room.simpleName(); },
-							getRoom : function() { return room; },
-							getCssClass : function() {
-								var availability = getRoomAvailability(room);
-								return getStatusClassString(availability.minutesTilFree, availability.minutesFreeFor);
-							},
-						};
-					rows.push(model);
-					return model;
-				},
-				getRow : function(room) {
-					var row;
-					$.each(rows, function() {
-						if (this.getRoom() === room) {
-							row = this;
-							return false;
+			var minutes = minutesBetween(a, b);
+			
+			if (minutes < 1) {
+				return "";
+			} else if (minutes < 60) {
+				return prefix + minutes + " minutes";
+			} else {
+				var hours = Math.floor(minutes / 60);
+				if (hours < 24) {
+					return prefix + hours + " hours";
+				} else {
+					return prefix + "a long time";
+				}
+			}
+		}
+		
+		function getRoomAvailability(room) {
+			var now = DebugSettings.now() || new Date(),
+				bookings = room.upcomingBookings(now),
+				availability = {
+					currentBooking : null,
+					nextBooking : null,
+					minutesTilFree : 0,
+					freeAt : now,
+					minutesFreeFor : Infinity
+				};
+				
+			if (bookings.length) {
+				var bIndex = 0;
+				var next = bookings[bIndex];
+				if (next.start < now) {
+					availability.currentBooking = {
+						title : next.event().title(),
+						organizer : next.event().organizer(),
+						minutesTilStart : 0,
+						minutesTilEnd : minutesBetween(now, next.end)
+					};
+					bIndex++;
+				}
+				next = bookings[bIndex];
+				if (next) {
+					availability.nextBooking = {
+						title : next.event().title(),
+						organizer : next.event().organizer(),
+						minutesTilStart : minutesBetween(now, next.start),
+						minutesTilEnd : minutesBetween(now, next.end)
+					};
+				}
+				
+				var freeTime = now, freeMinutes;
+				next = bookings.shift();
+				while(next && minutesBetween(freeTime, next.start) < minBookableMinutes) {
+					freeTime = next.end;
+					next = bookings.shift();
+				}
+				availability.freeAt = freeTime;
+				availability.minutesTilFree = minutesBetween(now, freeTime);
+				if (next) {
+					availability.minutesFreeFor = minutesBetween(freeTime, next.start);
+				}
+			}
+			
+			return availability;
+		}
+	
+		function getStatusClassString(minutesFreeIn, minutesFreeFor) {
+			return (
+					minutesFreeIn <= 0 ?
+						'status-free' :
+					minutesFreeIn <= maxStatusSoonMinutes ?
+						'status-soon' :
+						'status-busy'
+				) + ' ' + (
+					minutesFreeFor < minFreeTimeAdequateMinutes ?
+						'freetime-inadequate' :
+					minutesFreeFor <= maxBookableMinutes ?
+						'freetime-adequate' :
+						'freetime-long'
+				);
+		}
+			
+		return {
+			thisRoom : (function() {
+				var room;
+				return {
+					getRoom : function() { return room; },
+					getRoomStatusClassString : function() {
+						var availability = getRoomAvailability(room);
+						return getStatusClassString(availability.minutesTilFree, availability.minutesFreeFor);
+					},
+					getCurrentBooking : function() {
+						var currentBooking = getRoomAvailability(room).currentBooking;
+						if (currentBooking) {
+							currentBooking.when = "for " + currentBooking.minutesTilEnd + " more mins";
 						}
-					});
-					return row;
-				},
-				load : function(rooms) {
-					function loadRoom(room) {
-						room[room.loaded() ? "reload" : "load"](function() {
-							for (var i = 0; i < onLoad.length; i++) {
-								onLoad[i](self.createRoomRowViewModel(room));
-							}
-						});
+						return currentBooking;
+					},
+					getNextBooking : function() {
+						var nextBooking = getRoomAvailability(room).nextBooking;
+						if (nextBooking && nextBooking.minutesTilStart) {
+							nextBooking.when = "in " + nextBooking.minutesTilStart + " mins";
+						}
+						return nextBooking;
+					},
+					setRoom : function(theRoom) {
+						room = theRoom;
+					},
+					sync : function() {}
+				};
+			})(),
+			otherRooms : (function() {
+				var rows = {};
+				
+				function htmlEscape(str) {
+					return str ? str.replace(/'"`<>/g, function(c) {
+						switch(c) {
+							case "'": return "&apos;";
+							case '"': return "&quot;";
+							case "`": return "&apos;";
+							case "<": return "&lt;";
+							case ">": return "&gt;";
+							default: return "&#" + c.charCodeAt(0) + ";";
+						}
+					}) : str;
+				}
+				
+				function rowCompareTo(otherRow) {
+					var now = DebugSettings.now() || new Date(),
+						aRoom = this.getRoom(),
+						bRoom = otherRow.getRoom(),
+						aNextFree = aRoom.nextFreeTime(now),
+						bNextFree = bRoom.nextFreeTime(now),
+						aMinutesToFree = minutesBetween(now, aNextFree),
+						bMinutesToFree = minutesBetween(now, bNextFree);
+					
+					//free at the same time
+					if (aMinutesToFree == bMinutesToFree) {
+						//how long for?
+						var aBookedAt = aRoom.nextEventTime(aNextFree),
+							bBookedAt = bRoom.nextEventTime(bNextFree),
+							aFreeMinutes = aBookedAt ? minutesBetween(aNextFree, aBookedAt) : Infinity,
+							bFreeMinutes = bBookedAt ? minutesBetween(bNextFree, bBookedAt) : Infinity;
+					
+						if (aFreeMinutes == bFreeMinutes || (aFreeMinutes > maxBookableMinutes && bFreeMinutes > maxBookableMinutes)) {
+							return aRoom.name() < bRoom.name() ? -1 : 1;
+						} else {
+							return aFreeMinutes > bFreeMinutes ? -1 : 1;
+						}
+					} else {
+						//one is free first
+						return aMinutesToFree < bMinutesToFree ? -1 : 1;
 					}
 					
-					for(var i = 0; i < rooms.length; i++) {		
-						loadRoom(rooms[i]);
-					}
 				}
-			};
-		})(),
-		bookingData : (function() {
-			var bookingRoom,
-				availability,
-				bookingDuration;
-			return {
-				getBookingRoom : function() { return bookingRoom; },
-				getBookingRoomName : function() { return bookingRoom.simpleName(); },
-				getTimeFreeAtString : function() {
-					return timeBetweenString(DebugSettings.now() || new Date(), availability.freeAt, "in ");
-				},
-				getTimeAvailableString : function() {
-					return availability.minutesFreeFor >= maxBookableMinutes ? maxBookableMinutes + '+' : availability.minutesFreeFor;
-				},
-				addTimeInterval : function() {
-					bookingDuration += timeInterval;
-					if (bookingDuration > maxBookableMinutes || bookingDuration > availability.minutesFreeFor)
-						bookingDuration = Math.min(maxBookableMinutes, availability.minutesFreeFor);
-					return bookingDuration;
-				},
-				subtractTimeInterval : function() {
-					if (bookingDuration % timeInterval == 0 ) {
-						bookingDuration -= timeInterval;
-					} else {
-						bookingDuration -= bookingDuration % timeInterval;
+				
+				return {
+					createRoomRowViewModel : function(room) {
+						if (rows.hasOwnProperty(room.id())) {
+							throw new Error("A row has already been created for room " + room.simpleName() + " (ID: " + room.id() + ")");
+						}
+						
+						return rows[room.id()] = {
+								sync : function() {},
+								getHtmlId : function() { return htmlEscape(room.id()); },
+								getDisplayName : function() { return room.simpleName(); },
+								getRoom : function() { return room; },
+								getCssClass : function() {
+									var availability = getRoomAvailability(room);
+									return getStatusClassString(availability.minutesTilFree, availability.minutesFreeFor);
+								},
+								compareTo : rowCompareTo
+							};
+					},
+					getRow : function(room) {
+						return rows.hasOwnProperty(room.id()) ? rows[room.id()] : undefined;
 					}
-					if (bookingDuration < 0)
-						bookingDuration = Math.min(timeInterval, availability.minutesFreeFor);
-					return bookingDuration;
-				},
-				canAddTime : function() {
-					return bookingDuration < Math.min(availability.minutesFreeFor, maxBookableMinutes);
-				},
-				canSubtractTime : function() {
-					return bookingDuration > timeInterval;
-				},
-				getBookingDuration : function () {
-					return bookingDuration;
-				},
-				getBookingTime : function () {
-					var date = availability.freeAt || DebugSettings.now() || new Date();
-					date.setSeconds(0, 0);
-					return date;
-				},
-				setRoom : function(room) {
-					bookingRoom = room;
-					availability = getRoomAvailability(bookingRoom);
-					bookingDuration = availability.minutesFreeFor < defaultTimeBlock ?
-						(availability.minutesFreeFor < timeInterval ?
-							availability.minutesFreeFor :
-							Math.floor(availability.minutesFreeFor/timeInterval) * timeInterval
-						) :
-						defaultTimeBlock;
-				},
-				sync : function() {}
-			}; 
-		})(),
-	};
+				};
+			})(),
+			bookingData : (function() {
+				var bookingRoom,
+					availability,
+					bookingDuration;
+				return {
+					getBookingRoom : function() { return bookingRoom; },
+					getBookingRoomName : function() { return bookingRoom.simpleName(); },
+					getTimeFreeAtString : function() {
+						return timeBetweenString(DebugSettings.now() || new Date(), availability.freeAt, "in ");
+					},
+					getTimeAvailableString : function() {
+						return availability.minutesFreeFor >= maxBookableMinutes ? maxBookableMinutes + '+' : availability.minutesFreeFor;
+					},
+					addTimeInterval : function() {
+						bookingDuration += timeInterval;
+						if (bookingDuration > maxBookableMinutes || bookingDuration > availability.minutesFreeFor)
+							bookingDuration = Math.min(maxBookableMinutes, availability.minutesFreeFor);
+						return bookingDuration;
+					},
+					subtractTimeInterval : function() {
+						if (bookingDuration % timeInterval == 0 ) {
+							bookingDuration -= timeInterval;
+						} else {
+							bookingDuration -= bookingDuration % timeInterval;
+						}
+						if (bookingDuration < 0)
+							bookingDuration = Math.max(minBookableMinutes, Math.min(timeInterval, availability.minutesFreeFor));
+						return bookingDuration;
+					},
+					canAddTime : function() {
+						return bookingDuration < Math.min(availability.minutesFreeFor, maxBookableMinutes);
+					},
+					canSubtractTime : function() {
+						return bookingDuration > timeInterval;
+					},
+					getBookingDuration : function () {
+						return bookingDuration;
+					},
+					getBookingTime : function () {
+						var date = availability.freeAt || DebugSettings.now() || new Date();
+						date.setSeconds(0, 0);
+						return date;
+					},
+					canBook : function() {
+						return bookingDuration >= minBookableMinutes && bookingDuration <= Math.min(availability.minutesFreeFor, maxBookableMinutes);
+					},
+					setRoom : function(room) {
+						bookingRoom = room;
+						availability = getRoomAvailability(bookingRoom);
+						bookingDuration = availability.minutesFreeFor < defaultTimeBlock ?
+							(availability.minutesFreeFor < timeInterval ?
+								availability.minutesFreeFor :
+								Math.floor(availability.minutesFreeFor/timeInterval) * timeInterval
+							) :
+							defaultTimeBlock;
+					},
+					updateTimes : function() {
+						availability = getRoomAvailability(bookingRoom);
+						bookingDuration = Math.min(bookingDuration, Math.min(maxBookableMinutes, availability.minutesFreeFor));
+					}
+				}; 
+			})(),
+		};
+	})();
 		
 	var Stages = (function() {
-	
+		var $body = $('body'),
+			$close = $('#close').click(function (e) {
+				revertToPreviousStage();
+				e.stopPropagation();
+			});
+		
 		var currStage,
 			prevStages = [ ];
 		
-		function switchTo(newStage) {
-			if (currStage != Stages.Switching && currStage != newStage) {
-				prevStages.push(currStage);
-				currStage && $body.queue(currStage.exit).queue(newStage.enter);
+		function switchTo(newStage, asRevert) {
+			if (newStage && currStage !== Switching && currStage !== newStage) {
+				var prevStage = currStage;
+				currStage = Switching;
+				
+				if (prevStage) {
+					// If we're switching "backwards", don't push the current stage onto the stack
+					asRevert || prevStages.push(prevStage);
+					$body.queue(prevStage.exit);
+				}
+				
+				$body.queue(newStage.enter).queue(function() {
+					currStage = newStage;
+					$body.dequeue();
+				});
 			}
 		}
 		function revertToPreviousStage() {
-			var newStage = prevStages.pop();
-			currStage && newStage && $body.queue(currStage.exit).queue(newStage.enter);
-		}
-		function revertToStatus() {
-			while(prevStages.length && prevStages[prevStages.length - 1] != Stages.Status) {
-				prevStages.pop();
+			if (currStage !== Switching) {
+				var newStage = prevStages.pop();
+				if (newStage) {
+					switchTo(newStage, true);
+				}
 			}
+		}
+		function revertToInitial() {
+			prevStages.length && (prevStages = [ prevStages[0] ]);
 			revertToPreviousStage();
 		}
-		
-		$close.click(function (e) {
-			revertToPreviousStage();
-			e.stopPropagation();
-		});
 	
-		var stages = {
-			Status : (function() {
+		var Status = (function() {
 				var self,
 					model,
 					idleTimeout,
@@ -212,7 +316,7 @@ function initUi(thisRoom) {
 					$events,
 					$currentEvent,
 					$nextEvent;
-				return {
+				return self = {
 					name : 'status',
 					enter : function() {
 						$body.removeClass().addClass("show-status");	
@@ -224,33 +328,32 @@ function initUi(thisRoom) {
 						
 						self.update();
 						$status.fadeIn('slow', function() {
-							currStage = self;
 							$status.css('display', '');
 							$body.dequeue();
 						});
 					},
 					exit : function() {
-						currStage = Stages.Switching;
 						$status.fadeOut('fast', function() {
 							$body.removeClass();
 							
 							if (!idleTimeout) {
-								idleTimeout = ActivityMonitor.setIdleHandler(idleTimeoutSec * msPerSec, revertToStatus);
+								idleTimeout = ActivityMonitor.setIdleHandler(idleTimeoutSec * 1000, revertToInitial);
 							}
 							
 							$body.dequeue();
 						});
 					},
-					init : function($theContainer) {
-						self = this;
+					init : function($theContainer, thisRoom) {
 						model = ViewModels.thisRoom;
+						model.setRoom(thisRoom);
+						
 						$container = $theContainer;
 						$status = $('#status', $container).click(function(e) {
 							if (!model.getCurrentBooking()) {
-								ViewModels.bookingData.setRoom(model.getRoom());
-								switchTo(Stages.Book);
+								Book.setRoom(model.getRoom());
+								switchTo(Book);
 							} else {
-								switchTo(Stages.RoomList);
+								switchTo(RoomList);
 							}
 							e.stopPropagation();
 						});
@@ -258,6 +361,11 @@ function initUi(thisRoom) {
 						$events = $('.events', $status);
 						$currentEvent = $('#current-event', $events);
 						$nextEvent = $('#next-event', $events);
+						
+						GlobalEvents.bind('minuteChanged', self.update);
+						GlobalEvents.bind('roomUpdatedByServer', function(event, room) {
+							room === model.getRoom() && self.update();
+						});
 					},
 					update : (function() {
 						function updateEventDOM($eventDOM, event) {
@@ -288,24 +396,33 @@ function initUi(thisRoom) {
 					})()
 				};
 			})(),
-			RoomList : (function() {
+			RoomList = (function() {
 				var self,
 					model,
 					$rooms,
 					$roomsList;
-				return {
+				
+				function sortRoomList() {
+				
+					var $rooms = $roomsList.children();
+					var roomArray = $.makeArray($rooms.detach());
+						roomArray.sort(function(a, b) {
+							return $(a).data('model').compareTo($(b).data('model'));
+						});
+					$(roomArray).appendTo($roomsList);
+				}
+				
+				return self = {
 					name : 'rooms',
 					enter : function() {
 						$body.removeClass().addClass("show-rooms");				
 						$rooms.fadeIn('slow',function(){
-							$close.removeClass('hidden');
+							$close.toggleClass('hidden', !thisRoom);
 							$rooms.css('display', '');
-							currStage = Stages.RoomList;
 							$body.dequeue();
 						});
 					},
 					exit : function() {
-						currStage = Stages.Switching;
 						$rooms.fadeOut('fast',function() {
 							$body.removeClass('show-rooms');
 							$close.addClass('hidden');
@@ -313,11 +430,14 @@ function initUi(thisRoom) {
 						});
 					},
 					init : function($root) {
-						self = this;
 						model = ViewModels.otherRooms;
 						$rooms = $root;
 						$roomsList = $rooms.children('ul');
-						model.subscribeToNewRooms(this.createRow);
+						GlobalEvents.bind('roomLoaded', function(event, room) {
+							self.createRow(model.createRoomRowViewModel(room));
+						});
+						GlobalEvents.bind('roomUpdatedByServer', function(event, room) { self.updateRow(room); });
+						GlobalEvents.bind('minuteChanged', self.updateAllRows);
 						self.reset();
 					},
 					createRow : function(rowModel) {
@@ -328,8 +448,8 @@ function initUi(thisRoom) {
 							.find('strong')
 								.text(rowModel.getDisplayName());
 						$row.click(function(e) {
-							ViewModels.bookingData.setRoom(rowModel.getRoom());
-							switchTo(Stages.Book);
+							Book.setRoom(rowModel.getRoom());
+							switchTo(Book);
 							e.stopPropagation();
 						});
 						$roomsList.append($row);
@@ -354,9 +474,10 @@ function initUi(thisRoom) {
 					}
 				};
 			})(),
-			Book : (function() {
+			Book = (function() {
 				var self,
 					model,
+					$booking,
 					$roomName,
 					$freeIn,
 					$timeAvailable,
@@ -364,72 +485,47 @@ function initUi(thisRoom) {
 					$timeMore,
 					$timeLess,
 					$freeAt;
-				return {
-					name : 'book',
-					enter : function() {
-						self.reset();
-						$body.removeClass().addClass("show-booking");
-						$booking.fadeIn('slow',function(){
-							$booking.css('display', '');
-							$close.removeClass('hidden');
-							currStage = self;
-							$body.dequeue();
-						});
-					},
-					exit : function() {
-						currStage = Stages.Switching;
-						
-						$booking.fadeOut('fast',function(){
-							$body.removeClass('show-booking');
-							$close.addClass('hidden');
-							$body.dequeue();
-						});
-					},
-					init : function($root) {
-						self = this;
-						model = ViewModels.bookingData;
-						
-						$timeAvailable = $('#info .time-available', $root);
-						$timeRequired = $("#time-required", $root).click(this.onTimeRequiredClicked);
-						$timeMore = $("#time-more", $root).click(this.onMoreTimeClicked);
-						$timeLess = $("#time-less", $root).click(this.onLessTimeClicked);
-						$roomName = $('#room-name', $root);
-						$freeAt = $('.free-at', $root);
-					},
-					reset : function() {
-						$roomName.text(model.getBookingRoomName());
-						$timeAvailable.text(model.getTimeAvailableString());
-						$timeRequired.removeClass('disabled').text(model.getBookingDuration());
-						$freeAt.text(model.getTimeFreeAtString());
-						$timeMore.removeClass('hidden').toggleClass('disabled', !model.canAddTime());
-						$timeLess.removeClass('hidden').toggleClass('disabled', !model.canSubtractTime());
-					},
-					onTimeRequiredClicked : function(e) {
+					
+					function onTimeRequiredClicked(e) {
 						if (!$timeRequired.hasClass('disabled')) {
-							var bookingRoom = model.getBookingRoom();
-							EventManager.bookRoom(bookingRoom, 'Impromptu Meeting', model.getBookingTime(), model.getBookingDuration(),
-								function(a) {
-									bookingRoom.reload(function() {
-										Stages.Status.update();
-										Stages.RoomList.updateRow(ViewModels.otherRooms.getRow(bookingRoom));
-										sortRoomList();
-									});
-								},
-								function(b) { Logger.log('Error booking room', b); });
+							var bookingRoom = model.getBookingRoom(),
+								onComplete = function() {
+								};
 							$timeRequired
 								.text("Booked")
 								.siblings()
 									.addClass('hidden')
 								.end()
-								.delay(2000)
 								.queue(function() {
-									switchTo(Stages.Status);
-									$(this).dequeue();
+									var onComplete = function() {
+										GlobalEvents.unbind('roomUpdatedByServer', onSuccess);
+										GlobalEvents.unbind('bookingFailure', onFailure);
+										
+										switchTo(thisRoom ? Status : RoomList);
+										$timeRequired.dequeue();
+									}, onSuccess = function (event, room) {
+										if (room === bookingRoom) {
+											onComplete();
+										}
+									}, onFailure = function(event, room) {
+										if (room === bookingRoom) {
+											$timeRequired.text('ERROR');
+											setTimeout(onComplete, 2000);
+										}
+									};
+									GlobalEvents.bind('roomUpdatedByServer', onSuccess);
+									GlobalEvents.bind('bookingFailure', onFailure);
+									GlobalEvents.trigger('bookingAddedByUser', {
+										room : bookingRoom,
+										title : 'Impromptu Meeting',
+										time : model.getBookingTime(),
+										duration : model.getBookingDuration()
+									});
 								});
 						}
 						return false;
-					},
-					onMoreTimeClicked : function (e) {
+					}
+					function onMoreTimeClicked(e) {
 						if (!$timeMore.hasClass('disabled')) {
 							$timeRequired.text(model.addTimeInterval());
 							$timeMore.toggleClass('disabled', !model.canAddTime());
@@ -437,8 +533,8 @@ function initUi(thisRoom) {
 						}
 						
 						return false;
-					},
-					onLessTimeClicked : function (e) {
+					}
+					function onLessTimeClicked(e) {
 						if (!$timeLess.hasClass('disabled')) {
 							$timeRequired.text(model.subtractTimeInterval());
 							$timeMore.toggleClass('disabled', !model.canAddTime());
@@ -447,224 +543,84 @@ function initUi(thisRoom) {
 						
 						return false;
 					}
+					
+				return self = {
+					name : 'book',
+					enter : function() {
+						self.reset();
+						$body.removeClass().addClass("show-booking");
+						$booking.fadeIn('slow',function(){
+							$booking.css('display', '');
+							$close.removeClass('hidden');
+							$body.dequeue();
+						});
+					},
+					exit : function() {
+						$booking.fadeOut('fast',function(){
+							$body.removeClass('show-booking');
+							$close.addClass('hidden');
+							$body.dequeue();
+						});
+					},
+					init : function($root) {
+						model = ViewModels.bookingData;
+						
+						GlobalEvents.bind('minuteChanged', function() {
+							if (model.getBookingRoom()) {
+								model.updateTimes();
+								$timeAvailable.text(model.getTimeAvailableString());
+								$timeRequired.text(model.getBookingDuration()).toggleClass('disabled', !model.canBook());
+								$freeAt.text(model.getTimeFreeAtString());
+							}
+						});
+						
+						$booking = $root;
+						
+						$timeAvailable = $('#info .time-available', $root);
+						$timeRequired = $("#time-required", $root).click(onTimeRequiredClicked);
+						$timeMore = $("#time-more", $root).click(onMoreTimeClicked);
+						$timeLess = $("#time-less", $root).click(onLessTimeClicked);
+						$roomName = $('#room-name', $root);
+						$freeAt = $('.free-at', $root);
+					},
+					setRoom : function(room) {
+						model.setRoom(room);
+					},
+					reset : function() {
+						$roomName.text(model.getBookingRoomName());
+						$timeAvailable.text(model.getTimeAvailableString());
+						$timeRequired.removeClass('disabled').text(model.getBookingDuration());
+						$freeAt.text(model.getTimeFreeAtString());
+						$timeMore.removeClass('hidden').toggleClass('disabled', !model.canAddTime());
+						$timeLess.removeClass('hidden').toggleClass('disabled', !model.canSubtractTime());
+					}
 				};
 			})(),
-			Switching : null
-		};
+			Switching = {};
 		
-		currStage = stages.Status;
-		return stages;
-	})();
-	
-	function minutesBetween(a, b) {
-		return Math.ceil((b.getTime() - a.getTime()) / msPerMin);
-	}
-    function timeBetweenString(a, b, prefix) {
-		if (!a || !b) {
-			return "";
-		}
-		
-        var minutes = minutesBetween(a, b);
-        
-        if (minutes < 1) {
-			return "";
-		} else if (minutes < 60) {
-            return prefix + minutes + " minutes";
-        } else {
-            var hours = Math.floor(minutes / 60);
-            if (hours < 24) {
-                return prefix + hours + " hours";
-            } else {
-                return prefix + "a long time";
-            }
-        }
-    }
-	
-	function getRoomAvailability(room) {
-		var now = DebugSettings.now() || new Date(),
-			bookings = room.upcomingBookings(now),
-			availability = {
-				currentBooking : null,
-				nextBooking : null,
-				minutesTilFree : 0,
-				freeAt : now,
-				minutesFreeFor : Infinity
-			};
-			
-		if (bookings.length) {
-			var bIndex = 0;
-			var next = bookings[bIndex];
-			if (next.start < now) {
-				availability.currentBooking = {
-					title : next.event().title(),
-					organizer : next.event().organizer(),
-					minutesTilStart : 0,
-					minutesTilEnd : minutesBetween(now, next.end)
-				};
-				bIndex++;
-			}
-			next = bookings[bIndex];
-			if (next) {
-				availability.nextBooking = {
-					title : next.event().title(),
-					organizer : next.event().organizer(),
-					minutesTilStart : minutesBetween(now, next.start),
-					minutesTilEnd : minutesBetween(now, next.end)
-				};
-			}
-			
-			var freeTime = now, freeMinutes;
-			next = bookings.shift();
-			while(next && minutesBetween(freeTime, next.start) < minBookableMinutes) {
-				freeTime = next.end;
-				next = bookings.shift();
-			}
-			availability.freeAt = freeTime;
-			availability.minutesTilFree = minutesBetween(now, freeTime);
-			if (next) {
-				availability.minutesFreeFor = minutesBetween(freeTime, next.start);
-			}
-		}
-		
-		return availability;
-	}
-	
-	function getStatusClassString(minutesFreeIn, minutesFreeFor) {
-		return (
-				minutesFreeIn <= 0 ?
-					'status-free' :
-				minutesFreeIn <= maxStatusSoonMinutes ?
-					'status-soon' :
-					'status-busy'
-			) + ' ' + (
-				minutesFreeFor < minFreeTimeAdequateMinutes ?
-					'freetime-inadequate' :
-				minutesFreeFor <= maxBookableMinutes ?
-					'freetime-adequate' :
-					'freetime-long'
-			);
-	}
-		
-	function updateARoom() {
-		var otherRoom = EventManager.rooms[updateARoom.currIndex];
-		updateARoom.currIndex++;
-		updateARoom.currIndex %= EventManager.rooms.length;
-		
-		if (otherRoom == thisRoom) { // skip it, it has its own cycle.
-			updateARoom();
-		} else {
-			updateRoomRow(otherRoom);
-		}
-	}
-	updateARoom.currIndex = 0;
-	
-	function updateRoomRow(otherRoom) {
-		if (otherRoom && otherRoom != thisRoom && otherRoom.loaded()) {
-			otherRoom.reload(function() {
-				Stages.RoomList.updateRow(ViewModels.otherRooms.getRow(otherRoom));
-				sortRoomList();
-			});
-		}
-	}
-	function updateRoomRowUi(otherRoom) {
-		if(otherRoom.loaded()) {
-			var availability = getRoomAvailability(otherRoom);
-			$roomsList.find('#' + otherRoom.id().replace(/(\.|%)/g, '\\$1'))
-				.removeClass()
-				.addClass(getStatusClassString(availability.minutesTilFree, availability.minutesFreeFor))
-				.find('span')
-					.text(availability.minutesFreeIn <= 0 ? '' : availability.minutesTilFree);
-		}
-	}
-	function sortRoomList() {
-		var now = DebugSettings.now() || new Date();
-	
-		var $rooms = $roomsList.children();
-		var roomArray = $.makeArray($rooms.detach());
-			roomArray.sort(function(a, b) {
-				var aRoom = $(a).data('model').getRoom(),
-					bRoom = $(b).data('model').getRoom(),
-					aNextFree = aRoom.nextFreeTime(now),
-					bNextFree = bRoom.nextFreeTime(now),
-					aMinutesToFree = minutesBetween(now, aNextFree),
-					bMinutesToFree = minutesBetween(now, bNextFree);
-				
-				//free at the same time
-				if (aMinutesToFree == bMinutesToFree) {
-					//how long for?
-					var aBookedAt = aRoom.nextEventTime(aNextFree),
-						bBookedAt = bRoom.nextEventTime(bNextFree),
-						aFreeMinutes = aBookedAt ? minutesBetween(aNextFree, aBookedAt) : Infinity,
-						bFreeMinutes = bBookedAt ? minutesBetween(bNextFree, bBookedAt) : Infinity;
-				
-					if (aFreeMinutes == bFreeMinutes || (aFreeMinutes > maxBookableMinutes && bFreeMinutes > maxBookableMinutes)) {
-						return aRoom.name() < bRoom.name() ? -1 : 1;
+		return {
+			init : function(thisRoom) {
+				Book.init($('#booking'));
+				RoomList.init($('#rooms'));
+				if (thisRoom) {
+					Status.init($('#container'), thisRoom);
+					if (thisRoom.loaded()) {
+						switchTo(Status);
 					} else {
-						return aFreeMinutes > bFreeMinutes ? -1 : 1;
+						GlobalEvents.bind('roomLoaded', function(event, room) {
+							if (room === thisRoom) {
+								switchTo(Status);
+							}
+						});
 					}
 				} else {
-					//one is free first
-					return aMinutesToFree < bMinutesToFree ? -1 : 1;
+					switchTo(RoomList);
 				}
-			});
-        $(roomArray).appendTo($roomsList);
-	}
-
-	function runEveryNMinutesOnTheMthSecond(n, m, func) {
-		var firstDelaySec = m - (DebugSettings.now() || new Date()).getSeconds();
-		if (firstDelaySec <= 0) {
-			firstDelaySec +=  60;
-		}
-
-		setTimeout(function() {
-            try {
-                func();
-                setInterval(function() {
-                    try {
-                       func();
-                    } catch (err) {
-                        Logger.log("Error in repeated function.", err);
-                    }
-                }, msPerMin * n);
-            } catch (err) {
-                Logger.log("Error in repeated function.", err);
-            }
-		}, firstDelaySec * msPerSec);
-	}
+			}
+		};
+	})();
 	
-	thisRoom.load(function () {
-        try {
-			Stages.Status.init($('#container'));
-			Stages.Book.init($('#booking'));
-			Stages.RoomList.init($('#rooms'));
-			
-            //run immediately, then
-            ViewModels.thisRoom.setRoom(thisRoom);
-			Stages.Status.enter();
-            //load the other room data so we can display it right.
-			ViewModels.otherRooms.load(EventManager.rooms);
-
-            //Update all the minute values on the next minute start, then each minute thereafter.
-            //this is so the clock matches the system clock with no delay.
-            runEveryNMinutesOnTheMthSecond(1, 1, function() {
-                Stages.Status.update();
-                Stages.RoomList.updateAllRows();
-            });
-
-            //update this room's event data and make the ui match every 2 minutes on the :40.
-            runEveryNMinutesOnTheMthSecond(30, 40, function() {
-                        thisRoom.reload(function() {
-							Stages.Status.update();
-                            Stages.RoomList.updateRow(ViewModels.otherRooms.getRow(thisRoom));
-                            sortRoomList();
-                        });
-                    });
-            //update the other rooms over time - one every minute on the :20
-            runEveryNMinutesOnTheMthSecond(15, 20, updateARoom);
-        } catch (err) {
-            Logger.log(null, err);
-        }
-	});
+	Stages.init(thisRoom);
 }
 
 

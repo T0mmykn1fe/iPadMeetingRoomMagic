@@ -1,35 +1,115 @@
 (function() {
+
 	var roomName = ParameterParser.parse().room;
-
-	if (roomName) {
-		EventManager.init(function() {
-			var room = EventManager.getRoom(roomName);
-			EventManager.THIS_ROOM = room;
-			if (room) {
-				room.load();
-				initUi(room);
-			} else {
-				$('#count')
-					.css('font-size','18px')
-					.text('You entered an invalid room name.  The room could not be found.')
-					.show();
-			}
-		});
-	} else {
-		var locationStr =
-			window.location.protocol + '//' + window.location.host + window.location.pathname;
-		$('#loading')
-			.css('font-size','18px')
-			.text('You must enter a room name in the url in the form "' + locationStr + '?room={room name}"')
-			.show();
-	}
-
-	var oneDay = 1000 * 60 * 60 * 24;
-	var midnight = new Date(new Date().getTime() + oneDay);
-	midnight.setSeconds(0);
-	midnight.setMinutes(0);
-	midnight.setHours(0);
-	if (midnight < new Date()) midnight = new Date(midnight.getTime() + oneDay);
-	setTimeout(function() { window.location.reload();}, midnight - new Date());
 	
+	function runAtMidnight(func) {
+		var oneDay = 1000 * 60 * 60 * 24;
+		
+		var midnight = new Date(new Date().getTime() + oneDay);
+		midnight.setSeconds(0); midnight.setMinutes(0);midnight.setHours(0);
+		
+		// paranoia
+		while (midnight < new Date()) midnight = new Date(midnight.getTime() + oneDay);
+		
+		setTimeout(func, midnight - new Date());
+	}
+	function runEveryNMinutesOnTheMthSecond(n, m, func) {
+		var firstDelaySec = m - (DebugSettings.now() || new Date()).getSeconds();
+		if (firstDelaySec <= 0) {
+			firstDelaySec +=  60;
+		}
+
+		setTimeout(function() {
+            try {
+                func();
+                setInterval(function() {
+                    func();
+                }, 1000 * 60 * n);
+            } catch (err) {
+                Logger.log("Error in repeated function.", err);
+            }
+		}, firstDelaySec * 1000);
+	}
+	
+	function reloadRoom(room, callback) {
+		room.reload(function() {
+			GlobalEvents.trigger('roomUpdatedByServer', room);
+			callback && callback();
+		});
+	}
+	function beginReloadingRooms(thisRoom) {
+		var currIndex = 0;
+		function updateARoom() {
+			var otherRoom = EventManager.rooms[currIndex];
+			currIndex++;
+			currIndex %= EventManager.rooms.length;
+			
+			if (otherRoom == thisRoom) { // skip it, it has its own cycle.
+				updateARoom();
+			} else {
+				reloadRoom(otherRoom);
+			}
+		}
+	
+		runEveryNMinutesOnTheMthSecond(15, 20, updateARoom);
+	}
+	
+	EventManager.init(function() {
+		var thisRoom = roomName ? EventManager.getRoom(roomName) : undefined;
+		
+		if (roomName && !thisRoom) {
+			$('#errormsg')
+				.css('font-size','18px')
+				.text('You entered an invalid room name.  The room could not be found.')
+				.show();
+			return;
+		}
+		
+		//once all the "other" rooms are loaded, begin REloading them one at a time in a round robin to keep them up-to-date.
+		var afterAllRoomsLoaded = _.after(EventManager.rooms.length, function() { beginReloadingRooms(thisRoom); }),
+			loadOtherRooms = function(thisRoom) {
+				_.each(EventManager.rooms, function(room) {
+					thisRoom !== room && room.load(function() {
+						afterAllRoomsLoaded();
+						GlobalEvents.trigger('roomLoaded', room);
+					});
+				});
+			};
+			
+		initUi(thisRoom);
+		if (thisRoom) {
+			thisRoom.load(function() { // if we have a "this" room, we want to load it first without other loads getting in the way (not sure they actually will...)
+				GlobalEvents.trigger('roomLoaded', thisRoom);
+				afterAllRoomsLoaded();
+				
+				//begin reloading this room at regular intervals
+				runEveryNMinutesOnTheMthSecond(30, 40, function() { reloadRoom(thisRoom); });
+				
+				loadOtherRooms(thisRoom);
+			});
+		} else {
+			loadOtherRooms();
+		}
+		
+		//update UI when the minute ticks over.
+		runEveryNMinutesOnTheMthSecond(1, 1, function() {
+			GlobalEvents.trigger('minuteChanged');
+		});
+	});
+	
+	GlobalEvents.bind('bookingAddedByUser', function(event, booking) {
+		EventManager.bookRoom(booking.room, booking.title, booking.time, booking.duration,
+			function success() {			
+				booking.room.reload(function() {
+					GlobalEvents.trigger('roomUpdatedByServer', booking.room);
+				});
+			},
+			function failure() {
+				GlobalEvents.trigger('bookingFailure', booking);
+			}
+		);
+	});
+	
+	// update MEAT from server everyday at midnight.  gApps also seems to have some memory leaks.  This lets us avoid bad consequences from that...
+	runAtMidnight(function() { window.location.reload(); });
 })();
