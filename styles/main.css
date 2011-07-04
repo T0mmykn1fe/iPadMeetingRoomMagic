@@ -251,9 +251,9 @@ body {
 	width: 100%;
 }
 .event {
-	font-size: 2em;
+	font-size: 2.5em;
     text-align: center;
-	padding: 0 2.5em 2.5em;
+	padding: 0 2em 2em;
 }
 
 .event > .which {
@@ -414,7 +414,11 @@ body {
 	#minutes-free  {
 		font-size: 14em;
 	}
-	.no-events #minutes-free {
+	.events-upcoming-1 #minutes-free {
+		padding-top: 0.2em;
+		font-size: 30em;
+	}
+	.events-upcoming-0 #minutes-free {
 		padding-top: 0.2em;
 		font-size: 40em;
 	}
@@ -423,9 +427,15 @@ body {
 @media all and (orientation:landscape) { 
   /* Style adjustments for landscape mode goes here */
 	#minutes-free  {
-		font-size: 17em;
+		font-size: 25em;
 	}
-	.no-events #minutes-free {
+	
+	.events-upcoming-1 #minutes-free {
+		padding-top: 0.2em;
+		font-size: 23em;
+	}
+	
+	.events-upcoming-0 #minutes-free {
 		padding-top: 0.2em;
 		font-size: 30em;
 	}
@@ -439,10 +449,10 @@ body {
 		font-size: 2.5em;
 	}
 	.event:first-child  {
-		padding: 0 0.25em 1.2em 1em;
+		padding: 0 0.2em 1.2em 0.8em;
 	}
 	.event:last-child {
-		padding: 0 1em 1.2em 0.25em;
+		padding: 0 0.8em 1.2em 0.2em;
 	}
   
 }
@@ -450,7 +460,6 @@ body {
 /* Grade-A Mobile Browsers (Opera Mobile, iPhone Safari, Android Chrome)  
    Consider this: www.cloudfour.com/css-media-query-for-mobile-is-fools-gold/ */
 @media screen and (max-device-width: 480px) {
-    
     
 #info p,
 #controls p {
@@ -469,8 +478,11 @@ body {
     top: 1em;
 }
 
+#rooms-list {
+	margin-left: 10px;
+}
 #rooms-list li {
-    font-size:1.5em;    
+    font-size: 0.5em;
 }
   
   

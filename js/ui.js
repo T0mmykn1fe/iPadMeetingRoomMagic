@@ -130,6 +130,13 @@ function initUi(thisRoom) {
 					setRoom : function(theRoom) {
 						room = theRoom;
 					},
+					getDisplayedBookingCount : function() {
+						var availability = getRoomAvailability(room);
+						var bookings = 0;
+						availability.currentBooking && bookings++;
+						availability.nextBooking && bookings++;
+						return bookings;
+					},
 					sync : function() {}
 				};
 			})(),
@@ -388,10 +395,10 @@ function initUi(thisRoom) {
 								.removeClass()
 								.addClass(model.getRoomStatusClassString());
 							
-							//order matters - using append
 							updateEventDOM($currentEvent, model.getCurrentBooking());
 							updateEventDOM($nextEvent, model.getNextBooking());
-							$status.toggleClass("no-events", !$events.children(':visible').length);
+							
+							$status.removeClass().addClass("events-upcoming-" + model.getDisplayedBookingCount());
 						};
 					})()
 				};
@@ -436,7 +443,10 @@ function initUi(thisRoom) {
 						GlobalEvents.bind('roomLoaded', function(event, room) {
 							self.createRow(model.createRoomRowViewModel(room));
 						});
-						GlobalEvents.bind('roomUpdatedByServer', function(event, room) { self.updateRow(room); });
+						GlobalEvents.bind('roomUpdatedByServer', function(event, room) {
+							self.updateRow(room);
+							sortRoomList();
+						});
 						GlobalEvents.bind('minuteChanged', self.updateAllRows);
 						self.reset();
 					},
@@ -468,6 +478,7 @@ function initUi(thisRoom) {
 						$roomsList.children().each(function() {
 							self.updateRow($(this).data('model'));
 						});
+						sortRoomList();
 					},
 					reset : function() {
 						$roomsList.children().remove();
