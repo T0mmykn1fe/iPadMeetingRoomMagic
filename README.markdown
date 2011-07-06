@@ -44,7 +44,7 @@ Room displays should hit:
 
 Where {roomName} is the full case-sensitive name of the room they're in front of.
 
-If you'd like to have a display default to showing information for all rooms, 
+If you'd like to have a display show information for all rooms by default, 
 then just hit:
 
     http://example.com/path/to/meat/
