@@ -21,7 +21,7 @@ setup is on the server, and the displays just hit a url. So...
 
 You'll need the ./public directory files to be accessible from the web.
 
-### Setup a webserver - any webserver will do.
+### Step 2: Setup a webserver - any webserver will do.
 
 Apache HTTPD works for me, but if you like node and don't already have a server
 setup, you can do:
@@ -31,13 +31,13 @@ setup, you can do:
 
 Where the default port is 80 and the default path is ./public
 
-### Config (conf.js)
+### Step 3: Config (conf.js)
 
 Next edit conf.js with any custom configuration.  You'll definitely want to
 change {{appDomain}} to your Google Apps domain.  You can play wiht the other
 settings too, but they'll generally work as-is.
 
-### Displays
+### Step 4: Displays
 Room displays should hit:
 
     http://example.com/path/to/meat/?room={roomName}
