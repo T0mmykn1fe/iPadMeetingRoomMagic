@@ -8,6 +8,6 @@ var connect = require("connect");
 var server = connect.createServer(
     connect.favicon()
   , connect.logger()
-  , connect.static(process.argv[2] || __dirname + "/public")
+  , connect.static(process.argv[3] || __dirname + "/public")
 );
-server.listen(process.argv[3] || process.env.C9_PORT || 80);
+server.listen(process.env.C9_PORT || process.argv[2] || 80);
