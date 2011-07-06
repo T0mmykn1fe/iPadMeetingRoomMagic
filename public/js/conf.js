@@ -1,7 +1,7 @@
 /* Atlassian M.E.A.T.
  * Authors: Adam Ahmed, Martin Jopson, Stephen Russell, Robert Smart
  * (c) 2011 Atlassian Pty Ltd.
- * Atlassian M.E.A.T. may be freely distributed under the MIT license.
+ * Atlassian M.E.A.T. may be freely distributed under the MIT Expat license.
  */
 
 var EventManagerConfig = {
@@ -43,7 +43,7 @@ var EventManagerConfig = {
 			array to match only two specific rooms: 
 				['Syd - Coding Corner', 'Syd - Neo - Kent St']
 	*/
-	roomsToShow :  /^Syd - /
+	roomsToShow : null
 	
 	/*
 		A regex that defines parts of the room name NOT to display, or falsy to display the full name.
@@ -52,5 +52,5 @@ var EventManagerConfig = {
 			regex that would cause 'Syd - Coding Corner' to display as 'Coding Corner'
 				/^Syd - /g
 	*/
-,	removeRegex : /^Syd - /g
+,	removeRegex : null
 };

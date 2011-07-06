@@ -8,13 +8,13 @@ function initUi(thisRoom) {
 	
 	function coalesce(a,b) { return a == null ? b : a; }
 	var bookingParams = EventManagerConfig.bookingParameters || {};
-	var maxBookableMinutes = 			coalesce(bookingParams.maxBookableMinutes, 60),
-		minBookableMinutes = 			coalesce(bookingParams.minBookableMinutes, 5),
-		maxStatusSoonMinutes = 			coalesce(bookingParams.maxStatusSoonMinutes, 0),
-		minFreeTimeAdequateMinutes = 	coalesce(bookingParams.minFreeTimeAdequateMinutes, 0),
-		defaultTimeBlock = 				coalesce(bookingParams.defaultBookingMinutes, 30),
-		timeInterval = 					coalesce(bookingParams.bookingIntervalMinutes, 15),
-		idleTimeoutSec = 				coalesce(EventManagerConfig.idleTimeoutSeconds, 30);
+	var maxBookableMinutes =          coalesce(bookingParams.maxBookableMinutes, 60),
+		minBookableMinutes =          coalesce(bookingParams.minBookableMinutes, 5),
+		maxStatusSoonMinutes =        coalesce(bookingParams.maxStatusSoonMinutes, 0),
+		minFreeTimeAdequateMinutes =  coalesce(bookingParams.minFreeTimeAdequateMinutes, 0),
+		defaultTimeBlock =            coalesce(bookingParams.defaultBookingMinutes, 30),
+		timeInterval =                coalesce(bookingParams.bookingIntervalMinutes, 15),
+		idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30);
 	
 	var ViewModels = (function() {
 
