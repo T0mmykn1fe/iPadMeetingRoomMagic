@@ -1,4 +1,8 @@
-// ui js 
+/* Atlassian M.E.A.T.
+ * Authors: Adam Ahmed, Martin Jopson, Stephen Russell, Robert Smart
+ * (c) 2011 Atlassian Pty Ltd.
+ * Atlassian M.E.A.T. may be freely distributed under the MIT license.
+ */
 
 function initUi(thisRoom) {	
 	

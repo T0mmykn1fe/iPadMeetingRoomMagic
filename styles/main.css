@@ -1,4 +1,10 @@
-﻿/* 
+/* Atlassian M.E.A.T.
+ * Authors: Adam Ahmed, Martin Jopson, Stephen Russell, Robert Smart
+ * (c) 2011 Atlassian Pty Ltd.
+ * Atlassian M.E.A.T. may be freely distributed under the MIT license.
+ */
+
+/* 
   style.css contains a reset, font normalization and some base styles.
   
   credit is left where credit is due.
@@ -138,9 +144,8 @@ a:link { -webkit-tap-highlight-color: #FF5E99; }
 .hidden { display:none; visibility:hidden; } 
 
 
- /* Primary Styles
-    Author: Pool 10
- */
+/* end html5doctor.com Reset Stylesheet */
+
 #close {
     cursor: pointer;
     position: absolute;
