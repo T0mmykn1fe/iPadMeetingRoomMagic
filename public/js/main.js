@@ -67,7 +67,8 @@
 			$('#errormsg')
 				.css('font-size','18px')
 				.text('You entered an invalid room name.  The room could not be found.')
-				.show();
+				.removeClass('hidden');
+			$('#container').addClass('hidden');
 			return;
 		}
 		
