@@ -140,10 +140,11 @@ var DebugSettings = (function(){
 	var vars = ParameterParser.parse(),
 		offsetFromServerTime;
 	
-	if (EventManagerConfig.timeServerJSONPUrl) {
+	if (false && EventManagerConfig.timeServerJSONPUrl) {
 		$.ajax(EventManagerConfig.timeServerJSONPUrl, {
 			dataType: "jsonp",
-			async: false
+			async: false,
+			timeout: 10000
 		}).done(function(data) {
 			if (data && data.datetime) {
 				var serverDate = new Date(data.datetime);
