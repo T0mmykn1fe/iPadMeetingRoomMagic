@@ -137,11 +137,31 @@ var ActivityMonitor = (function() {
 })();
 
 var DebugSettings = (function(){
-	var vars = ParameterParser.parse();
+	var vars = ParameterParser.parse(),
+		offsetFromServerTime;
+	
+	if (EventManagerConfig.timeServerJSONPUrl) {
+		$.ajax(EventManagerConfig.timeServerJSONPUrl, {
+			dataType: "jsonp",
+			async: false,
+			timeout: 10000
+		}).done(function(data) {
+			if (data && data.datetime) {
+				var serverDate = new Date(data.datetime);
+				if (!isNaN(+serverDate)) { // valid date
+					offsetFromServerTime = serverDate - new Date();
+				}
+			}
+		}).fail(function(xhr, textStatus, errorThrown) {
+			console.log("Error while contacting time server: " + textStatus);
+		});
+	}
 	
 	return {
 		now : vars.debug ?
 				function() { return new Date(2011, 6, 1, 15, 25, 0); } :
-				function() {}
+				function() {
+					return offsetFromServerTime == null ? new Date() : new Date((+new Date()) + offsetFromServerTime);
+				}
 	};
 })();

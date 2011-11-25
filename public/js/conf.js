@@ -53,4 +53,16 @@ var EventManagerConfig = {
 				/^Syd - /g
 	*/
 ,	removeRegex : null
+
+    /*
+		The URL of a JSONP time server to use for defining "now"
+		The response must be a JSON object containing a property "datetime".
+		"datetime" should contain a string with the current time, parseable by the javascript Date constructor.
+		
+		To use the client's time instead, don't specify a timeServerJSONPUrl.
+		
+		Example:
+			"http://json-time.appspot.com/time.json?tz=Australia/Sydney"
+	*/
+,	timeServerJSONPUrl : null
 };

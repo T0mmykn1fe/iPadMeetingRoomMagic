@@ -345,6 +345,7 @@ var EventManager = (function() {
 			} :
 		EventManagerConfig.roomsToShow.test ?
 			function(name) {
+				EventManagerConfig.roomsToShow.lastIndex = 0;
 				return EventManagerConfig.roomsToShow.test(name);
 			} :
 		Logger.log('EventManagerConfig.roomsToShow must be falsy, an Array of strings, or a RegExp object.');
