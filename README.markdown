@@ -34,7 +34,7 @@ Where the default port is 80 and the default path is ./public
 ### Step 3: Config (conf.js)
 
 Next edit conf.js with any custom configuration.  You'll definitely want to
-change {{appDomain}} to your Google Apps domain.  You can play wiht the other
+change {{appDomain}} to your Google Apps domain.  You can play with the other
 settings too, but they'll generally work as-is.
 
 ### Step 4: Displays
@@ -42,7 +42,8 @@ Room displays should hit:
 
     http://example.com/path/to/meat/?room={roomName}
 
-Where {roomName} is the full case-sensitive name of the room they're in front of.
+Where {roomName} is the full, case-sensitive, URL-encoded name of the room 
+they're in front of.
 
 If you'd like to have a display show information for all rooms by default, 
 then just hit:
