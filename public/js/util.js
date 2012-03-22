@@ -159,7 +159,7 @@ var DebugSettings = (function(){
 	
 	return {
 		now : vars.debug ?
-				function() { return new Date(2011, 6, 1, 15, 25, 0); } :
+				function() { return new Date(2012, 2, 14, 10, 15, 0); } :
 				function() {
 					return offsetFromServerTime == null ? new Date() : new Date((+new Date()) + offsetFromServerTime);
 				}

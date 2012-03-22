@@ -504,7 +504,7 @@ var EventManager = (function() {
 					maxDate.setDate(maxDate.getDate() + 1);
 					var feedUrl  =
 						"https://www.google.com/calendar/feeds/" + room.id() + 
-						"/private/full?orderby=starttime&sortorder=a" +
+						"/private/full?singleevents=true&orderby=starttime&sortorder=a" +
 						"&max-results=" + 25 +
 						"&start-min=" + toRFC3339Date(minDate) + "&start-max=" + toRFC3339Date(maxDate);
 					return EventManager.calendarService().getEventsFeed(feedUrl, onSuccess, onError);
