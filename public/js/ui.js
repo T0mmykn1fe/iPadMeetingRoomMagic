@@ -8,13 +8,19 @@ function initUi(thisRoom) {
 	
 	function coalesce(a,b) { return a == null ? b : a; }
 	var bookingParams = EventManagerConfig.bookingParameters || {};
+	var enabledPeriods = EventManagerConfig.enabledPeriod || {};
+
 	var maxBookableMinutes =          coalesce(bookingParams.maxBookableMinutes, 60),
 		minBookableMinutes =          coalesce(bookingParams.minBookableMinutes, 5),
 		maxStatusSoonMinutes =        coalesce(bookingParams.maxStatusSoonMinutes, 0),
 		minFreeTimeAdequateMinutes =  coalesce(bookingParams.minFreeTimeAdequateMinutes, 0),
 		defaultTimeBlock =            coalesce(bookingParams.defaultBookingMinutes, 30),
-		timeInterval =                coalesce(bookingParams.bookingIntervalMinutes, 15),
-		idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30);
+		timeInterval =                coalesce(bookingParams.bookingIntervalMinutes, 15);
+
+	var enabledDays =                 coalesce(enabledPeriods.days, [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun' ]),
+		enabledTimeRange =            coalesce(enabledPeriods.timeRange, { start : '00:00', end : '24:00'  });
+
+	var idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30);
 	
 	var ViewModels = (function() {
 
@@ -635,7 +641,117 @@ function initUi(thisRoom) {
 		};
 	})();
 	
+
+
+	var SleepTimer = (function() {
+		var $body = $(document.body);
+
+		function isEnabledToday(date) {
+			return -1 !== $.inArray(
+					{ '1':'Mon', '2':'Tue', '3':'Wed', '4':'Thu', '5':'Fri', '6':'Sat', '0':'Sun' }[date.getDay()],
+					enabledDays);
+		}
+
+		function shouldEnable(date) {
+
+			if (!isEnabledToday(date)) {
+				return false;
+			}
+
+			var startEnabled = new Date(date);
+			var startTime = enabledTimeRange.start.split(':');
+			startEnabled.setHours(startTime[0]);
+			startEnabled.setMinutes(startTime[1]);
+			startEnabled.setSeconds(0);
+
+			var endEnabled = new Date(date);
+			var endTime = enabledTimeRange.end.split(':');
+			endEnabled.setHours(endTime[0]);
+			endEnabled.setMinutes(endTime[1]);
+			endEnabled.setSeconds(0);
+
+			return date >= startEnabled && date <= endEnabled;
+		}
+
+		function nextEnablementEvent(date) {
+			if (shouldEnable(date)) {
+				var endEnabled = new Date(date);
+				var endTime = enabledTimeRange.end.split(':');
+				endEnabled.setHours(endTime[0]);
+				endEnabled.setMinutes(endTime[1]);
+				endEnabled.setSeconds(0);
+				return {
+					event : 'disable',
+					date : endEnabled
+				};
+			} else {
+				
+				if (!enabledDays.length) {
+					return null;
+				}
+
+
+				var startEnabled = new Date(date);
+				var startTime = enabledTimeRange.start.split(':');
+				startEnabled.setHours(startTime[0]);
+				startEnabled.setMinutes(startTime[1]);
+				startEnabled.setSeconds(0);
+
+				var nextEnabledDay = new Date(date);
+				if (nextEnabledDay > startEnabled) { // inlcude today only if we're before the normal start time
+					nextEnabledDay = new Date(nextEnabledDay.getTime() + (24 * 60 * 60 * 1000));
+				}
+				while(!isEnabledToday(nextEnabledDay)) {
+					nextEnabledDay = new Date(nextEnabledDay.getTime() + (24 * 60 * 60 * 1000));
+				}
+
+				var startEnabled = new Date(nextEnabledDay);
+				startEnabled.setHours(startTime[0]);
+				startEnabled.setMinutes(startTime[1]);
+				startEnabled.setSeconds(0);
+
+				return {
+					event : 'enable',
+					date : startEnabled
+				};
+			}
+		}
+
+		function msBetween(a, b) {
+			return b - a;
+		}
+
+		return {
+			init : function() {
+
+				var isIdle = false;
+				ActivityMonitor.setIdleHandler(0, function() {
+					isIdle = false;
+					$body.removeClass('disabled');
+				});
+				ActivityMonitor.setIdleHandler(30 * 1000, function() {
+					isIdle = true;
+					var now = DebugSettings.now() || new Date();
+					$body.toggleClass('disabled', !shouldEnable(now));
+				});
+
+				function onEvent() {
+					var now = DebugSettings.now() || new Date();
+					
+					if (isIdle) {
+						$body.toggleClass('disabled', !shouldEnable(now));
+					}
+
+					var nextEvent = nextEnablementEvent(new Date(now));
+					var msTilNextEvent = msBetween(now, nextEvent.date);
+					setTimeout(onEvent, msTilNextEvent > 0 ? msTilNextEvent : 1);
+				}
+				onEvent();
+			}
+		};
+	})();
+
+
 	Stages.init(thisRoom);
+	SleepTimer.init();
 }
-
-

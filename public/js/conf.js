@@ -65,4 +65,22 @@ var EventManagerConfig = {
 			"http://json-time.appspot.com/time.json?tz=Australia/Sydney"
 	*/
 ,	timeServerJSONPUrl : null
+
+	/*
+		Use this setting to "disable" MEAT during non-office hours. The MEAT will still work,
+		but the display will be black when left idle for 30s or more. By default, MEAT will display at all times.
+
+		"days" should be an array of 3-letter weekday abbreviations
+		MEAT will be enabled between "start" and "end" times on those days.
+
+		The format of these settings is very strict - only 3-letter weekday abbreviations and 4-digit 24-hour time
+		are supported.
+	*/
+,	enabledPeriod : null/*{
+		days : [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun' ],
+		timeRange : {
+			start : '07:00',
+			end : '19:00'
+		}
+	}*/
 };

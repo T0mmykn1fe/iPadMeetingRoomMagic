@@ -91,12 +91,7 @@ var ActivityMonitor = (function() {
 		return (dateB - dateA);
 	}
 	
-	$(document)
-		.mousemove(recordActivity)
-		.click(recordActivity)
-		.bind('touchstart', recordActivity)
-		.bind('touchmove', recordActivity)
-		.bind('touchend', recordActivity);
+	$(document).bind('mousemove click touchstart touchmove touchend', recordActivity);
 		
 	return {
 		setIdleHandler : function(idleMs, handler) {
