@@ -250,12 +250,14 @@ var EventManager = (function() {
 
 	return new (function () {
 		var url;
+		var secretKey;
 
 		var roomsByName;
 		var roomsById;
 		
-		this.init = function(rootUrl, callback) {
+		this.init = function(rootUrl, secret, callback) {
 			url = rootUrl;
+			secretKey = secret;
 			getRooms(function(res){
 				EventManager.rooms = Room.getRooms(res.rooms);
 				roomsByName = {};
@@ -270,32 +272,49 @@ var EventManager = (function() {
 				callback();
 			}, function(err) { Logger.log('GetAvailableCalendars error', err); });
 		};
+
+		function isForbidden(xhr, next) {
+			if (xhr.status === 403) {
+				window.location.href = url + 'forbidden';
+				return;
+			}
+			return next();
+		}
+
+		function errorHandler(onError) {
+			return function(xhr) {
+				var self = this, args = arguments;
+				return isForbidden(xhr, function() { return onError && onError.apply(self, args); });
+			};
+		}
 		
 		function getRooms(onSuccess, onError) {
 			return $.ajax({
-				url : url + 'data/rooms',
+				url : url + 'data/rooms' + (secretKey ? '?secret=' + secretKey : ''),
 				dataType : 'json',
 				success : onSuccess,
-				error : onError
+				error : errorHandler(onError)
 			});
 		}
 
 		function getEvents(roomKey, onSuccess, onError) {
 			return $.ajax({
-				url : url + 'data/events?room=' + roomKey,
+				url : url + 'data/events?room=' + roomKey + (secretKey ? '&secret=' + secretKey : ''),
 				dataType : 'json',
 				success : onSuccess,
-				error : onError
+				error : errorHandler(onError)
 			});
 		}
 
 		function bookRoom(roomKey, startTimeISO, endTimeISO, onSuccess, onError) {
 			return $.ajax({
 				type: 'POST',
-				url : url + 'data/events?room=' + roomKey + '&start=' + startTimeISO + '&end=' + endTimeISO,
+				url : url + 'data/events?room=' + roomKey +
+					'&start=' + startTimeISO + '&end=' + endTimeISO +
+					(secretKey ? '&secret=' + secretKey : ''),
 				dataType : 'json',
 				success : onSuccess,
-				error : onError
+				error : errorHandler(onError)
 			});
 		}
 		

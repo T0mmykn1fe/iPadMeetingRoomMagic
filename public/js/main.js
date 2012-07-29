@@ -5,8 +5,8 @@
  */
  
 (function() {
-
-	var roomName = ParameterParser.parse().room;
+	var params = ParameterParser.parse();
+	var roomName = params.room;
 	
 	function runAtMidnight(func) {
 		var oneDay = 1000 * 60 * 60 * 24;
@@ -73,7 +73,7 @@
 	}
 
 	DebugSettings.init(getRootUrl());
-	EventManager.init(getRootUrl(), function() {
+	EventManager.init(getRootUrl(), params.secret, function() {
 		var thisRoom = roomName ? EventManager.getRoom(roomName) : undefined;
 		
 		if (roomName && !thisRoom) {
