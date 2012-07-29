@@ -65,8 +65,8 @@ function initUi(thisRoom) {
 				var next = bookings[bIndex];
 				if (next.start < now) {
 					availability.currentBooking = {
-						title : next.event().title(),
-						organizer : next.event().organizer(),
+						title : next.title(),
+						organizer : next.organizer(),
 						minutesTilStart : 0,
 						minutesTilEnd : minutesBetween(now, next.end)
 					};
@@ -75,8 +75,8 @@ function initUi(thisRoom) {
 				next = bookings[bIndex];
 				if (next) {
 					availability.nextBooking = {
-						title : next.event().title(),
-						organizer : next.event().organizer(),
+						title : next.title(),
+						organizer : next.organizer(),
 						minutesTilStart : minutesBetween(now, next.start),
 						minutesTilEnd : minutesBetween(now, next.end)
 					};

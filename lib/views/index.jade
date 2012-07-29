@@ -1,0 +1,58 @@
+body.loading
+    p#close.hidden x
+    #errormsg.hidden
+    #container.status-busy
+        #status
+            #minutes-free
+            .events
+                #current-event.event.hidden
+                    h4.which This Meeting
+                    h3.organizer Organizer
+                    h2.title Title
+                    h3.when When
+                #next-event.event.hidden
+                    h4.which Next Meeting
+                    h3.organizer Organizer
+                    h2.title Title
+                    h3.when When
+        table#booking(cellpadding="0", cellspacing="0")
+            tr
+                td
+                    #info
+                        p
+                            span#room-name
+                                | This room
+                            |  is free 
+                            span.free-at
+                                | at time-o-clock
+                            |  for 
+                            strong.time-available
+                                | ?
+                            |  minutes
+
+            tr
+                td#p2
+                    #controls
+                        p
+                            | Book it 
+                            span.free-at
+                            |  for?
+                        ul#time
+                            li#time-less.time-adjust
+                                | &mdash;
+                            li#time-required
+                                | 30
+                            li#time-more.time-adjust
+                                | +
+
+        section#rooms
+            ul#rooms-list
+                li Loading...
+
+    script(src="js/jquery-1.5.1.min.js")
+    script(src="js/underscore-min.js")
+    script(src="js/conf.js")
+    script(src="js/util.js")
+    script(src="js/ui.js")
+    script(src="js/eventManager.js")
+    script(src="js/main.js")

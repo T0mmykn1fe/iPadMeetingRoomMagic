@@ -135,24 +135,24 @@ var DebugSettings = (function(){
 	var vars = ParameterParser.parse(),
 		offsetFromServerTime;
 	
-	if (EventManagerConfig.timeServerJSONPUrl) {
-		$.ajax(EventManagerConfig.timeServerJSONPUrl, {
-			dataType: "jsonp",
-			async: false,
-			timeout: 10000
-		}).done(function(data) {
-			if (data && data.datetime) {
-				var serverDate = new Date(data.datetime);
-				if (!isNaN(+serverDate)) { // valid date
-					offsetFromServerTime = serverDate - new Date();
-				}
-			}
-		}).fail(function(xhr, textStatus, errorThrown) {
-			console.log("Error while contacting time server: " + textStatus);
-		});
-	}
-	
 	return {
+		init : function(rootUrl) {
+			$.ajax({
+				url : rootUrl + 'data/time',
+				dataType: "json",
+				async: false,
+				timeout: 10000
+			}).done(function(data) {
+				if (data && data.datetime) {
+					var serverDate = new Date(data.datetime);
+					if (!isNaN(+serverDate)) { // valid date
+						offsetFromServerTime = serverDate - new Date();
+					}
+				}
+			}).fail(function(xhr, textStatus, errorThrown) {
+				console.log("Error while contacting time server: " + textStatus);
+			});
+		},
 		now : vars.debug ?
 				function() { return new Date(2012, 2, 14, 10, 15, 0); } :
 				function() {

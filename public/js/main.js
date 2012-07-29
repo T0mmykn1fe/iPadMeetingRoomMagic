@@ -60,7 +60,20 @@
 		runEveryNMinutesOnTheMthSecond(15, 20, updateARoom);
 	}
 	
-	EventManager.init(function() {
+	function getRootUrl() {
+		var qsStart = window.location.href.indexOf('?');
+		var hashStart = window.location.href.indexOf('#');
+		var url = window.location.href.substring(0,
+			Math.min(~qsStart ? qsStart : Infinity, ~hashStart ? hashStart : Infinity));
+		
+		if (url.lastIndexOf('/') !== url.length - 1) {
+			url += '/';
+		}
+		return url;
+	}
+
+	DebugSettings.init(getRootUrl());
+	EventManager.init(getRootUrl(), function() {
 		var thisRoom = roomName ? EventManager.getRoom(roomName) : undefined;
 		
 		if (roomName && !thisRoom) {
@@ -105,7 +118,7 @@
 	});
 	
 	GlobalEvents.bind('bookingAddedByUser', function(event, booking) {
-		EventManager.bookRoom(booking.room, booking.title, booking.time, booking.duration,
+		EventManager.bookRoom(booking.room, booking.time, booking.duration,
 			function success() {			
 				booking.room.reload(function() {
 					GlobalEvents.trigger('roomUpdatedByServer', booking.room);
