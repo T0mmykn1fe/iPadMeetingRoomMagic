@@ -23,7 +23,7 @@
   ],
   "main": "lib/MEATIER",
   "engines": {
-    "node": "~0.6.15"
+    "node": "~0.8.8"
   },
   "scripts": {
     "test": "grunt test"
