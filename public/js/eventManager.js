@@ -1,9 +1,3 @@
-/* Atlassian M.E.A.T.
- * Authors: Adam Ahmed, Martin Jopson, Stephen Russell, Robert Smart
- * (c) 2011 Atlassian Pty Ltd.
- * Atlassian M.E.A.T. may be freely distributed under the MIT Expat license.
- */
-
 var EventManager = (function() {
 	var TimeRange = function(start, end) {
 		this.start = start;
