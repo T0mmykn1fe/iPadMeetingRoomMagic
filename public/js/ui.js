@@ -19,6 +19,10 @@ function initUi(thisRoom) {
 	
 	var ViewModels = (function() {
 
+		function pluralize(num, one, many) {
+			return num === 1 ? one : many;
+		}
+
 		function minutesBetween(a, b) {
 			return Math.ceil((b.getTime() - a.getTime()) / 60000);
 		}
@@ -33,14 +37,40 @@ function initUi(thisRoom) {
 			if (minutes < 1) {
 				return "";
 			} else if (minutes < 60) {
-				return prefix + minutes + " minutes";
+				return prefix + minutes + pluralize(minutes, " minute", " minutes");
 			} else {
 				var hours = Math.floor(minutes / 60);
 				if (hours < 24) {
-					return prefix + hours + " hours";
+					return prefix + hours + pluralize(hours, " hour", " hours");
 				} else {
 					return prefix + "a long time";
 				}
+			}
+		}
+
+		function minutesLeftToday() {
+			var now = DebugSettings.now() || new Date();
+			var end = new Date(new Date().getTime() + (1000 * 60 * 60 * 24));
+			end.setHours(0);
+			end.setMinutes(0);
+			end.setSeconds(0);
+
+			return (end - now) / 1000 / 60;
+		}
+
+		function minutesToDurationString(mins, isOngoing) {
+			if (mins < 60) {
+				return isOngoing ?
+					'for ' + mins + pluralize(mins, ' more min', ' more mins') :
+					'in ' + mins + pluralize(mins, ' min', ' mins');
+			}
+			if (mins > minutesLeftToday()) {
+				return isOngoing ? 'for a long time' : 'tomorrow';
+			} else {
+				var hours = Math.floor(mins / 60);
+				return isOngoing ?
+					'for ' + hours + pluralize(hours, '+ more hour', '+ more hours') :
+					'in ' + hours + pluralize(hours, ' hour', ' hours');
 			}
 		}
 		
@@ -121,14 +151,16 @@ function initUi(thisRoom) {
 					getCurrentBooking : function() {
 						var currentBooking = getRoomAvailability(room).currentBooking;
 						if (currentBooking) {
-							currentBooking.when = "for " + currentBooking.minutesTilEnd + " more mins";
+							currentBooking.when =
+								minutesToDurationString(currentBooking.minutesTilEnd, true);
 						}
 						return currentBooking;
 					},
 					getNextBooking : function() {
 						var nextBooking = getRoomAvailability(room).nextBooking;
 						if (nextBooking && nextBooking.minutesTilStart) {
-							nextBooking.when = "in " + nextBooking.minutesTilStart + " mins";
+							nextBooking.when =
+								minutesToDurationString(nextBooking.minutesTilStart, false);
 						}
 						return nextBooking;
 					},
@@ -523,8 +555,8 @@ function initUi(thisRoom) {
 										if (room === bookingRoom) {
 											onComplete();
 										}
-									}, onFailure = function(event, room) {
-										if (room === bookingRoom) {
+									}, onFailure = function(event, booking) {
+										if (booking.room === bookingRoom) {
 											$timeRequired.text('ERROR');
 											setTimeout(onComplete, 2000);
 										}
@@ -620,15 +652,7 @@ function initUi(thisRoom) {
 				RoomList.init($('#rooms'));
 				if (thisRoom) {
 					Status.init($('#container'), thisRoom);
-					if (thisRoom.loaded()) {
-						switchTo(Status);
-					} else {
-						GlobalEvents.bind('roomLoaded', function(event, room) {
-							if (room === thisRoom) {
-								switchTo(Status);
-							}
-						});
-					}
+					switchTo(Status);
 				} else {
 					switchTo(RoomList);
 				}

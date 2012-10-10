@@ -31,29 +31,6 @@
 		}, firstDelaySec * 1000);
 	}
 	
-	function reloadRoom(room, callback) {
-		room.reload(function() {
-			GlobalEvents.trigger('roomUpdatedByServer', room);
-			callback && callback();
-		});
-	}
-	function beginReloadingRooms(thisRoom) {
-		var currIndex = 0;
-		function updateARoom() {
-			var otherRoom = EventManager.rooms[currIndex];
-			currIndex++;
-			currIndex %= EventManager.rooms.length;
-			
-			if (otherRoom == thisRoom) { // skip it, it has its own cycle.
-				updateARoom();
-			} else {
-				reloadRoom(otherRoom);
-			}
-		}
-	
-		runEveryNMinutesOnTheMthSecond(15, 20, updateARoom);
-	}
-	
 	function getRootUrl() {
 		var qsStart = window.location.href.indexOf('?');
 		var hashStart = window.location.href.indexOf('#');
@@ -66,8 +43,21 @@
 		return url;
 	}
 
+	function updateRooms() {
+		EventManager.update(function success(newRooms) {
+			_.each(newRooms, function(room) {
+				GlobalEvents.trigger('roomLoaded', room);
+			});
+			_.each(EventManager.rooms, function(room) {
+				GlobalEvents.trigger('roomUpdatedByServer', room);
+			});
+		}, function error() {
+			console.log('Error while updating rooms.');
+		});
+	}
+
 	DebugSettings.init(getRootUrl());
-	EventManager.init(getRootUrl(), params.secret, function() {
+	EventManager.init(getRootUrl(), params.secret, function(newRooms) {
 		var thisRoom = roomName ? EventManager.getRoom(roomName) : undefined;
 		
 		if (roomName && !thisRoom) {
@@ -78,45 +68,23 @@
 			$('#container').addClass('hidden');
 			return;
 		}
-		
-		//once all the "other" rooms are loaded, begin REloading them one at a time in a round robin to keep them up-to-date.
-		var afterAllRoomsLoaded = _.after(EventManager.rooms.length, function() { beginReloadingRooms(thisRoom); }),
-			loadOtherRooms = function(thisRoom) {
-				_.each(EventManager.rooms, function(room) {
-					thisRoom !== room && room.load(function() {
-						afterAllRoomsLoaded();
-						GlobalEvents.trigger('roomLoaded', room);
-					});
-				});
-			};
 			
 		initUi(thisRoom);
-		if (thisRoom) {
-			thisRoom.load(function() { // if we have a "this" room, we want to load it first without other loads getting in the way (not sure they actually will...)
-				GlobalEvents.trigger('roomLoaded', thisRoom);
-				afterAllRoomsLoaded();
-				
-				//begin reloading this room at regular intervals
-				runEveryNMinutesOnTheMthSecond(30, 40, function() { reloadRoom(thisRoom); });
-				
-				loadOtherRooms(thisRoom);
-			});
-		} else {
-			loadOtherRooms();
-		}
+		
+		_.each(newRooms, function(room) {
+			GlobalEvents.trigger('roomLoaded', room);
+		});
+
+		runEveryNMinutesOnTheMthSecond(1, 31, updateRooms);
 		
 		//update UI when the minute ticks over.
-		runEveryNMinutesOnTheMthSecond(1, 1, function() {
-			GlobalEvents.trigger('minuteChanged');
-		});
+		runEveryNMinutesOnTheMthSecond(1, 1, function() { GlobalEvents.trigger('minuteChanged'); });
 	});
 	
 	GlobalEvents.bind('bookingAddedByUser', function(event, booking) {
 		EventManager.bookRoom(booking.room, booking.time, booking.duration,
 			function success() {			
-				booking.room.reload(function() {
-					GlobalEvents.trigger('roomUpdatedByServer', booking.room);
-				});
+				updateRooms();
 			},
 			function failure() {
 				GlobalEvents.trigger('bookingFailure', booking);
@@ -124,6 +92,6 @@
 		);
 	});
 	
-	// update MEAT from server everyday at midnight.  gApps also seems to have some memory leaks.  This lets us avoid bad consequences from that...
+	// update MEAT from server everyday at midnight.
 	runAtMidnight(function() { window.location.reload(); });
 })();

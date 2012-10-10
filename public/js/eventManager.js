@@ -32,19 +32,15 @@ var EventManager = (function() {
 				0;
 	};
 
-	function CalendarEvent(eventJson, room) {
-		TimeRange.call(this, new Date(eventJson.start), new Date(eventJson.end));
+	function CalendarEvent(jsonOrEvent) {
+		TimeRange.call(this, new Date(jsonOrEvent.start), new Date(jsonOrEvent.end));
 
-		this._title = eventJson.title || 'Unnamed Event';
-		this._organizer = eventJson.organizer;
-		this._room = room;
+		this._title = jsonOrEvent._title || jsonOrEvent.title || 'Unnamed Event';
+		this._organizer = jsonOrEvent._organizer || jsonOrEvent.organizer;
 	}
 	$.extend(CalendarEvent.prototype, TimeRange.prototype, {
 		conflictsWith : function (date) {
 			return this.intersects(date);
-		},
-		includesRoom : function(roomName) {
-			return roomName === this._room.name();
 		},
 		nextNonConflict : function (afterDate) {
 			if (this.intersects(afterDate)) {
@@ -70,37 +66,22 @@ var EventManager = (function() {
 	var Room;
 	(function() {
 		Room = function (roomJson) {
-			var _events;
-			var _loaded = false;
+			var _events = CalendarEvent.getEvents(roomJson.events);
 
+			delete roomJson.events;
+			
 			this._meta = roomJson;
 
-			this.loaded = function() { return _loaded; };
+			this.events = function(events) {
+				if (events) {
+					_events = CalendarEvent.getEvents(events);
 
-			this.events = function() { return _events; };
-
-			this.load = function(callback) {
-				if (!_loaded) {
-					this.reload(callback);
+					this._nextFreeTimeCache = {};
+					this._nextEventCache = {};
 				} else {
-					callback && callback();
+					return _events;
 				}
-			};
-			var thisRoom = this;
-			this.reload = function(callback) {
-				EventManager.getRoomEvents(this, function(res) {
-					try {
-						_events = CalendarEvent.getEvents(res.events);
-						_events.sort(CalendarEvent.sorter);
-						thisRoom._nextFreeTimeCache = {};
-						thisRoom._nextEventCache = {};
-						_loaded = true;
-						callback && callback();
-					} catch (e) {
-						Logger.log("Error during reload.", e);
-					}
-				}, function (ret) { Logger.log('Error loading room', ret); });
-			};
+			}.bind(this);
 
 			this._nextFreeTimeCache = {};
 			this._nextEventCache = {};
@@ -110,10 +91,6 @@ var EventManager = (function() {
 
 			if (room._nextEventCache[dateObj]) {
 				return room._nextEventCache[dateObj];
-			}
-
-			if (!room.loaded()) {
-				Logger.log('Room not loaded.');
 			}
 
 			var minDate = null, minDateEvent = null;
@@ -140,10 +117,6 @@ var EventManager = (function() {
 				function() { return this.name(); },
 			isBooked : function (dateToCheck) {
 				var dateObj = dateToCheck || DebugSettings.now() || new Date();
-
-				if (!this.loaded()) {
-					Logger.log('Room not loaded.');
-				}
 
 				for (var i = 0; i < this.events().length; i++) {
 					if(this.events()[i].conflictsWith(dateObj)) {
@@ -172,10 +145,6 @@ var EventManager = (function() {
 
 				if (this._nextFreeTimeCache[dateObj]) {
 					return this._nextFreeTimeCache[dateObj];
-				}
-
-				if (!this.loaded()) {
-					Logger.log('Room not loaded.');
 				}
 
 				var maxofMinFreeDates = new Date(dateObj);
@@ -249,21 +218,35 @@ var EventManager = (function() {
 		var roomsByName;
 		var roomsById;
 		
+		function addNewRoom(room) {
+			EventManager.rooms.push(room);
+			roomsByName[room.name()] = room;
+			roomsById[room.id()] = room;
+		}
+
 		this.init = function(rootUrl, secret, callback) {
 			url = rootUrl;
 			secretKey = secret;
-			getRooms(function(res){
-				EventManager.rooms = Room.getRooms(res.rooms);
-				roomsByName = {};
-				roomsById = {};
+			this.rooms = [];
+			roomsByName = {};
+			roomsById = {};
+
+			this.update(callback);
+		};
+
+		this.update = function(callback) {
+			getRooms(function(res) {
+				var newRooms = [];
+				_.each(Room.getRooms(res.rooms), function(room) {
+					if (room.id() in roomsById) {
+						roomsById[room.id()].events(room.events());
+					} else {
+						newRooms.push(room);
+						addNewRoom(room);
+					}
+				});
 				
-				for(var i = 0; i < EventManager.rooms.length; i++) {
-					var currRoom = EventManager.rooms[i];
-					roomsByName[currRoom.name()] = currRoom;
-					roomsById[currRoom.id()] = currRoom;
-				}
-				
-				callback();
+				callback(newRooms);
 			}, function(err) { Logger.log('GetAvailableCalendars error', err); });
 		};
 
@@ -284,16 +267,7 @@ var EventManager = (function() {
 		
 		function getRooms(onSuccess, onError) {
 			return $.ajax({
-				url : url + 'data/rooms' + (secretKey ? '?secret=' + secretKey : ''),
-				dataType : 'json',
-				success : onSuccess,
-				error : errorHandler(onError)
-			});
-		}
-
-		function getEvents(roomKey, onSuccess, onError) {
-			return $.ajax({
-				url : url + 'data/events?room=' + roomKey + (secretKey ? '&secret=' + secretKey : ''),
+				url : url + 'data/rooms?expand' + (secretKey ? '&secret=' + secretKey : ''),
 				dataType : 'json',
 				success : onSuccess,
 				error : errorHandler(onError)
@@ -317,10 +291,6 @@ var EventManager = (function() {
 		};
 		this.getRoomById = function (roomId) {
 			return roomsById[roomId];
-		};
-		
-		this.getRoomEvents = function(room, onSuccess, onError) {
-			return getEvents(room.id(), onSuccess, onError);
 		};
 		
 		this.bookRoom = function(room, startTime, durationMinutes, onSuccess, onError) {
