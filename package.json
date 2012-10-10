@@ -1,7 +1,7 @@
 {
-  "name": "MEATIER",
+  "name": "meat",
   "description": "Meeting room kiosk app for displaying meeting room schedules and booking rooms in your organization. Built against Google Apps, but other sources can be defined.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://bitbucket.org/aahmed/meat",
   "author": {
     "name": "Adam Ahmed",
@@ -21,9 +21,12 @@
       "url": "https://bitbucket.org/aahmed/meat/blob/master/LICENSE-MIT"
     }
   ],
+  "bin" : {
+    "meat" : "bin/meat"
+  },
   "main": "lib/MEATIER",
   "engines": {
-    "node": "~0.8.8"
+    "node": ">0.6.0"
   },
   "scripts": {
     "test": "grunt test"
