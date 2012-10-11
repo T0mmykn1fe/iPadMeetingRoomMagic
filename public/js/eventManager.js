@@ -72,16 +72,17 @@ var EventManager = (function() {
 			
 			this._meta = roomJson;
 
+			var self = this;
 			this.events = function(events) {
 				if (events) {
 					_events = CalendarEvent.getEvents(events);
 
-					this._nextFreeTimeCache = {};
-					this._nextEventCache = {};
+					self._nextFreeTimeCache = {};
+					self._nextEventCache = {};
 				} else {
 					return _events;
 				}
-			}.bind(this);
+			};
 
 			this._nextFreeTimeCache = {};
 			this._nextEventCache = {};
