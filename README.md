@@ -98,8 +98,9 @@ Note: there is little to no security in MEAT. If your Google Apps information ne
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](https://github.com/cowboy/grunt).
 
 ## Release History
-* 0.1.0 - Used now deprecated GApps v2 API. Served static files only and each client pinged Google independently
+* 0.2.1 - Fix mobile Safari bug - no support for function.prototype.bind.
 * 0.2.0 - A web server pings Google, and all the client displays talk to the central server for data.
+* 0.1.0 - Used now deprecated GApps v2 API. Served static files only and each client pinged Google independently
 
 ## What's next?
 
