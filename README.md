@@ -86,9 +86,9 @@ These URLs can be added to the Home screen on iPads and iPhones for quick bookin
 
 ### Why can't I see any rooms?
 
-One reason you might not be able to see any meeting rooms is that MEAT by default will only pick up "resource" rooms. See http://support.google.com/a/bin/answer.py?hl=en&answer=1033925 for more info.
+One reason you might not be able to see any meeting rooms is that MEAT by default will only pick up "resource" rooms. See http://support.google.com/a/bin/answer.py?hl=en&answer=1033925 for more info. If you'd like to disable this and include all visible calendars, set { ... gapps: { ... resourcesOnly : false } } in your config file.
 
-Another reason you might not see a room is that the calendar does not appear in your MEAT user's calendar list. Add it to the MEAT user's "Other calendars" list through the Google website: http://calendar.google.com
+Another reason you might not see a room is that the calendar does not appear in your MEAT user's calendar list. Add it to your dedicated MEAT user's "Other calendars" list through the Google website: http://calendar.google.com
 
 ## Security
 
