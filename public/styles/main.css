@@ -146,7 +146,7 @@ a:link { -webkit-tap-highlight-color: #FF5E99; }
     top: 0;
     right: 0;
     padding: 0.5em;
-	font-size: 150%;
+    font-size: 150%;
 }
 
 html,
@@ -161,17 +161,17 @@ body {
     color: #fff;
     font:1.2em/1.2 helvetica, arial, sans-serif;
     font-weight: bold;
-	user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
 }
 @-webkit-keyframes rotate {
-	from {
-	-webkit-transform: rotate(0deg);
-	}
-	to { 
-		-webkit-transform: rotate(360deg);
-	}
+    from {
+    -webkit-transform: rotate(0deg);
+    }
+    to { 
+        -webkit-transform: rotate(360deg);
+    }
 }
 
 body.disabled {
@@ -183,34 +183,34 @@ body.disabled #container {
 }
 
 .loading{
-	background: #333 url(../images/ajax-loader.gif) 50% 50% no-repeat;
+    background: #333 url(../images/ajax-loader.gif) 50% 50% no-repeat;
 }
 .loading #status,
 .loading #booking,
 .loading #rooms {
-	display: none;
+    display: none;
 }
 
 .show-status #loading,
 .show-status #booking,
 .show-status #rooms {
-	display : none;
+    display : none;
 }
 .show-booking #loading,
 .show-booking #status,
 .show-booking #rooms {
-	display : none;
+    display : none;
 }
 .show-rooms #loading,
 .show-rooms #status,
 .show-rooms #booking {
-	display : none;
+    display : none;
 }
 
 #container {
     -webkit-transition-property: color, background; 
-	-webkit-transition-duration: 1s, 1s; 
-	-webkit-transition-timing-function: linear, ease-in;
+    -webkit-transition-duration: 1s, 1s; 
+    -webkit-transition-timing-function: linear, ease-in;
 }
 
 /* Room is free - white on green */
@@ -239,41 +239,41 @@ body.disabled #container {
 }
 
 #container #minutes-free:after {
-	content: "✘";
+    content: "✘";
 }
 #container.status-free #minutes-free:after {
-	content: "✓";
+    content: "✓";
 }
 
 .events {
-	position: absolute;
-	bottom : 0;
-	width: 100%;
+    position: absolute;
+    bottom : 0;
+    width: 100%;
 }
 .event {
-	font-size: 2.5em;
+    font-size: 2.5em;
     text-align: center;
-	padding: 0 2em 2em;
+    padding: 0 2em 2em;
 }
 
 .event > .which {
-	font-size: 0.6em;
-	padding-bottom: 4px;
+    font-size: 0.6em;
+    padding-bottom: 4px;
 }
 .event > .title,
 .event > .organizer ,
 .event > .when {
-	font-weight: normal;
+    font-weight: normal;
     padding: 6px 0.5em;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .event > .title {
-	font-weight: bold;
+    font-weight: bold;
 }
 .event > .organizer {
-	font-style: italic;
+    font-style: italic;
 }
 
 #controls {
@@ -348,7 +348,7 @@ body.disabled #container {
 }
 
 #rooms-list {
-	font-size: 3em;
+    font-size: 3em;
     padding: 0.4em 0;
     list-style:none;  
 
@@ -360,10 +360,10 @@ body.disabled #container {
     -webkit-border-radius: 0.2em;
     -moz-border-radius: 0.2em;
     border-radius: 0.2em;
-	cursor: pointer;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: clip;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
 }
 #rooms-list li.status-free {
     background: #319900;  
@@ -411,49 +411,49 @@ body.disabled #container {
 
 @media all and (orientation:portrait) { 
   /* Style adjustments for portrait mode goes here */
-	#minutes-free  {
-		font-size: 14em;
-	}
-	.events-upcoming-1 #minutes-free {
-		padding-top: 0.2em;
-		font-size: 30em;
-	}
-	.events-upcoming-0 #minutes-free {
-		padding-top: 0.2em;
-		font-size: 40em;
-	}
+    #minutes-free  {
+        font-size: 14em;
+    }
+    .events-upcoming-1 #minutes-free {
+        padding-top: 0.2em;
+        font-size: 30em;
+    }
+    .events-upcoming-0 #minutes-free {
+        padding-top: 0.2em;
+        font-size: 40em;
+    }
 }
 
 @media all and (orientation:landscape) { 
   /* Style adjustments for landscape mode goes here */
-	#minutes-free  {
-		font-size: 25em;
-	}
-	
-	.events-upcoming-1 #minutes-free {
-		padding-top: 0.2em;
-		font-size: 23em;
-	}
-	
-	.events-upcoming-0 #minutes-free {
-		padding-top: 0.2em;
-		font-size: 30em;
-	}
-	
-	.event {
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		box-sizing: border-box;
-		display: inline-block;
-		width: 50%;
-		font-size: 2.5em;
-	}
-	.event:first-child  {
-		padding: 0 0.2em 1.2em 0.8em;
-	}
-	.event:last-child {
-		padding: 0 0.8em 1.2em 0.2em;
-	}
+    #minutes-free  {
+        font-size: 25em;
+    }
+    
+    .events-upcoming-1 #minutes-free {
+        padding-top: 0.2em;
+        font-size: 23em;
+    }
+    
+    .events-upcoming-0 #minutes-free {
+        padding-top: 0.2em;
+        font-size: 30em;
+    }
+    
+    .event {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        display: inline-block;
+        width: 50%;
+        font-size: 2.5em;
+    }
+    .event:first-child  {
+        padding: 0 0.2em 1.2em 0.8em;
+    }
+    .event:last-child {
+        padding: 0 0.8em 1.2em 0.2em;
+    }
   
 }
 
@@ -479,7 +479,7 @@ body.disabled #container {
 }
 
 #rooms-list {
-	margin-left: 10px;
+    margin-left: 10px;
 }
 #rooms-list li {
     font-size: 0.5em;
