@@ -1,73 +1,34 @@
 /* 
   style.css contains a reset, font normalization and some base styles.
+  Mostly cropped down for what we're actually using.
   
   credit is left where credit is due.
   additionally, much inspiration was taken from these projects:
     yui.yahooapis.com/2.8.1/build/base/base.css
     camendesign.com/design/
     praegnanz.de/weblog/htmlcssjs-kickstart
-*/
-
-/* 
+ 
   html5doctor.com Reset Stylesheet (Eric Meyer's Reset Reloaded + HTML5 baseline)
   v1.4 2009-07-27 | Authors: Eric Meyer & Richard Clark
   html5doctor.com/html-5-reset-stylesheet/
 */
 
-html, body, div, span, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-abbr, address, cite, code,
-del, dfn, em, img, ins, kbd, q, samp,
-small, strong, sub, sup, var,
+html, body, div, span,
+h1, h2, h3, h4, h5, h6, p,
+em, small, strong,
 b, i,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, figure, footer, header, 
-hgroup, menu, nav, section, menu,
-time, mark, audio, video {
+dl, dt, dd, ol, ul, li {
   margin:0;
   padding:0;
   border:0;
   outline:0;
-  font-size:100%;
   vertical-align:baseline;
   background:transparent;
 }                  
 
-article, aside, figure, footer, header, 
-hgroup, nav, section { display:block; }
-
-nav ul { list-style:none; }
-
-blockquote, q { quotes:none; }
-
-blockquote:before, blockquote:after,
-q:before, q:after { content:''; content:none; }
-
 a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
 
-ins { background-color:#ff9; color:#000; text-decoration:none; }
-
-mark { background-color:#ff9; color:#000; font-style:italic; font-weight:bold; }
-
-del { text-decoration: line-through; }
-
-abbr[title], dfn[title] { border-bottom:1px dotted #000; cursor:help; }
-
-/* tables still need cellspacing="0" in the markup */
-table { border-collapse:collapse; border-spacing:0; }
-
-hr { display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 0; padding:0; }
-
-input, select { vertical-align:middle; }
 /* END RESET CSS */
-
-
-/* normalize monospace sizing 
- * en.wikipedia.org/wiki/MediaWiki_talk:Common.css/Archive_11#Teletype_style_fix_for_Chrome
- */
-pre, code, kbd, samp { font-family: monospace, sans-serif; }
 
 /* www.aestheticallyloyal.com/public/optimize-legibility/ */ 
 h1,h2,h3,h4,h5,h6 { font-weight: bold; text-rendering: optimizeLegibility; }
@@ -87,41 +48,7 @@ ul { margin-left:30px; }
 ol { margin-left:30px; list-style-type: decimal; }
 
 small { font-size:85%; }
-strong, th { font-weight: bold; }
-
-table {
-    height: 100%;
-    width: 100%;
-    border-collapse: collapse;
-}
-td {
-    text-align: center;
-    vertical-align: middle;
-    width: 100%;
-}
-
-sub { vertical-align: sub; font-size: smaller; }
-sup { vertical-align: super; font-size: smaller; }
-
-pre { 
-  padding: 15px; 
-  
-  /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
-  white-space: pre; /* CSS2 */
-  white-space: pre-wrap; /* CSS 2.1 */
-  white-space: pre-line; /* CSS 3 (and 2.1 as well, actually) */
-  word-wrap: break-word; /* IE */
-}
-
-/* align checkboxes, radios, text inputs with their label
-   by: Thierry Koblentz tjkdesign.com/ez-css/css/base.css  */
-input[type="radio"] { vertical-align: text-bottom; }
-input[type="checkbox"] { vertical-align: bottom; *vertical-align: baseline; }
-.ie6 input { vertical-align: text-bottom; }
-
-/* hand cursor on clickable input elements */
-label, input[type=button], input[type=submit], button { cursor: pointer; }
-
+strong { font-weight: bold; }
 
 /* These selection declarations have to be separate.
    No text-shadow: twitter.com/miketaylr/status/12228805301 
@@ -135,7 +62,7 @@ a:link { -webkit-tap-highlight-color: #FF5E99; }
 
 /* Hide for both screenreaders and browsers
    css-discuss.incutio.com/wiki/Screenreader_Visibility */
-.hidden { display:none; visibility:hidden; } 
+.hidden { display:none !important; visibility:hidden !important; } 
 
 
 /* end html5doctor.com Reset Stylesheet */
@@ -143,10 +70,10 @@ a:link { -webkit-tap-highlight-color: #FF5E99; }
 #close {
     cursor: pointer;
     position: absolute;
-    top: 0;
-    right: 0;
-    padding: 0.5em;
-    font-size: 150%;
+    top: 4rem;
+    left: 4rem;
+    font-size: 5rem;
+    line-height: 1;
 }
 
 html,
@@ -159,7 +86,7 @@ body,
 body {
     background: #333;
     color: #fff;
-    font:1.2em/1.2 helvetica, arial, sans-serif;
+    font: 5rem helvetica, arial, sans-serif;
     font-weight: bold;
     user-select: none;
     -moz-user-select: none;
@@ -238,36 +165,43 @@ body.disabled #container {
     position: relative;
 }
 
-#container #minutes-free:after {
-    content: "✘";
+#minutes-free {
+    overflow: hidden;
+    max-height: 100%;
 }
-#container.status-free #minutes-free:after {
+
+#minutes-free:after {
+    content: "✘";
+    width: 100%;
+    overflow: hidden;
+}
+.status-free #minutes-free:after {
     content: "✓";
 }
 
-.events {
-    position: absolute;
-    bottom : 0;
-    width: 100%;
-}
 .event {
-    font-size: 2.5em;
+    box-sizing: border-box;
+    font-size: 15rem;
     text-align: center;
-    padding: 0 2em 2em;
+    padding: 2rem;
+    overflow: hidden;
 }
 
 .event > .which {
     font-size: 0.6em;
-    padding-bottom: 4px;
+    padding-bottom: 1rem;
 }
 .event > .title,
 .event > .organizer ,
 .event > .when {
     font-weight: normal;
-    padding: 6px 0.5em;
+    font-size: 1.1em;
+    padding: 1rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: 100%;
+    box-sizing: border-box;
 }
 .event > .title {
     font-weight: bold;
@@ -276,12 +210,27 @@ body.disabled #container {
     font-style: italic;
 }
 
-#controls {
-
+#booking > * {
+    text-align: center;
+    height: 50%;
 }
+
+#info {
+    line-height: 1;
+    color: #fff;
+    font-size: 8rem;
+    padding: 13rem 2rem 0;
+    box-sizing: border-box;
+}
+
+#info strong {
+    display: block;
+    font-size: 2em;
+}
+
 #controls p {
-    font-size:2em;
-    margin-bottom: 0.65em;
+    font-size:10rem;
+    padding: 5rem 5rem 3rem;
 }
 #controls #time,
 #controls #time li {
@@ -292,55 +241,53 @@ body.disabled #container {
 #controls #time li {
     cursor: pointer;
     display:inline-block;
-    font-size:4em;
+    font-size:18rem;
     font-weight: bold;
-    margin:0 0.3em;
+    margin:0 3rem;
     line-height:2em;  
     background:rgba(255,255,255,0.9);
     color:#222; 
+    vertical-align: middle;
 }
 
 #controls #time li.time-adjust {
-    -webkit-border-radius: 2em;
-    -moz-border-radius: 2em;
-    border-radius: 2em;
-    font-size:2em;
-    height:2em;
-    width:2em; 
+    border-radius: 15rem;
+    font-size:15rem;
+    height:15rem;
+    width:15rem; 
 }
+#controls #time #time-more:after {
+    content : '';
+    display: block;
+    background-color: #000;
+    height: 0.5em;
+    width: 0.125em;
+    margin: 0.25em 0.4375em;
+    border-radius: 0.125em;
+}
+#controls #time #time-less:before,
+#controls #time #time-more:before {
+    content : '';
+    display: block;
+    background-color: #000;
+    height: 0.125em;
+    width: 0.5em;
+    margin: 0.4375em 0.25em;
+    position: absolute;
+    border-radius: 0.125em;
+}
+
 #controls #time li.time-adjust.disabled {
     background:rgba(255,255,255,0.3);
 }
 #controls #time li#time-required {
     vertical-align: middle;
-    -webkit-border-radius: 0.2em;
-    -moz-border-radius: 0.2em;
-    border-radius: 0.2em;
-    padding: 0.125em 0.25em 0;
-    line-height: 1.4;
+    border-radius: 5rem;
+    padding: 2rem 2rem 0;
+    line-height: 1.2;
     
 }
-#info {
-    line-height: 1;
-}
 
-#info p {
-    color: #fff;
-    font-size:2em;
-    padding: 1em;
-    margin: 1em 0;
-
-}
-
-#info p:first-of-type strong {
-    display: block;
-    font-size: 200%;
-    margin-top: 0.1em;
-}
-
-#booking td {
-    height: 50%;
-}
 
 /* Rooms */
 #rooms {
@@ -348,25 +295,23 @@ body.disabled #container {
 }
 
 #rooms-list {
-    font-size: 3em;
-    padding: 0.4em 0;
-    list-style:none;  
-
+    font-size: 10rem;
+    margin: 0;
+    padding: 8rem 2rem;
+    list-style:none;
 }
 #rooms-list li {
     text-align: left;
-    margin: 0.4em 0.6em 0.4em 0.4em;
-    padding: 0.2em;
-    -webkit-border-radius: 0.2em;
-    -moz-border-radius: 0.2em;
-    border-radius: 0.2em;
+    margin: 4rem;
+    padding: 1rem;
+    border-radius: 2rem;
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;
 }
 #rooms-list li.status-free {
-    background: #319900;  
+    background: #319900;
 }
 #rooms-list li.status-soon,
 #rooms-list li.freetime-inadequate {
@@ -380,8 +325,8 @@ body.disabled #container {
 
 #rooms-list li em,
 #rooms-list li span {
-    margin-right: 0.5em;
-    min-width: 1.5em;
+    margin-right: 0.5rem;
+    min-width: 1.5rem;
     text-align: right;
     
 }
@@ -398,10 +343,13 @@ body.disabled #container {
     display: none;
     font-style: normal;
 }
-#rooms-list li strong:before {
+#rooms-list li:before {
     content: "✘";
+    display: inline-block;
+    width: 1.1em;
+    text-align: center;
 }
-#rooms-list li.status-free strong:before {
+#rooms-list li.status-free:before {
     content: "✓";
 }
 
@@ -410,83 +358,185 @@ body.disabled #container {
  */
 
 @media all and (orientation:portrait) { 
-  /* Style adjustments for portrait mode goes here */
-    #minutes-free  {
-        font-size: 14em;
+
+    #close {
+        font-size: 3rem;
+        top: 3rem;
+        left: 3rem;
+    }
+
+    .events-upcoming-0 #minutes-free  {
+        font-size: 70rem;
+        padding-top: 15rem;
     }
     .events-upcoming-1 #minutes-free {
-        padding-top: 0.2em;
-        font-size: 30em;
+        font-size: 30rem;
     }
-    .events-upcoming-0 #minutes-free {
-        padding-top: 0.2em;
-        font-size: 40em;
+    .events-upcoming-1 .events {
+        height: 70rem;
+        padding: 0;
+    }
+    .events-upcoming-1 .event {
+        height: 100%;
+        padding: 12rem 0 0;
+        font-size: 6rem;
+        box-sizing: border-box;
+    }
+    .events-upcoming-1 .which {
+        margin-bottom: 2rem;
+    }
+    .events-upcoming-1 .title {
+        white-space: normal;
+        max-height: 4em;
+    }
+
+    .events-upcoming-2 #minutes-free {
+        font-size: 20rem;
+    }
+    .events-upcoming-2 .events {
+        height: 80rem;
+        padding: 0;
+    }
+    .events-upcoming-2 .event {
+        height: 50%;
+        padding: 4rem 0 0;
+        font-size: 6rem;
+        box-sizing: border-box;
+    }
+    .events-upcoming-2 .which {
+        margin-bottom: 2rem;
+    }
+
+    #rooms-list {
+        padding: 7rem 0;
+    }
+    #rooms-list li {
+        font-size: 4rem;
+        margin: 1.5rem;
+        border-radius: 1rem;
+    }
+
+    #info {
+        font-size: 6rem;
+        padding: 10rem 2rem 0;
+        overflow: hidden;
+    }
+    #controls p {
+        font-size:6rem;
+        padding: 5rem 5rem 3rem;
+    }
+    #controls #time li {
+        font-size:14rem;
+        margin:0 3rem;
+        line-height:2em;
+    }
+    #controls #time li.time-adjust {
+        border-radius: 12rem;
+        font-size:12rem;
+        height:12rem;
+        width:12rem; 
+    }
+    #controls #time li#time-required {
+        vertical-align: middle;
+        border-radius: 5rem;
+        padding: 2rem 2rem 0;
+        line-height: 1.2;
+    }
+}
+
+/*iPhone 5 or other elongated phones*/
+@media all and (orientation:portrait) and (max-aspect-ratio: 2/3) { 
+
+    #controls #time li {
+        font-size:12rem;
+        margin:0 2rem;
+        line-height:2em;
+    }
+    #controls #time li.time-adjust {
+        border-radius: 8rem;
+        font-size:8rem;
+        height:8rem;
+        width:8rem; 
+    }
+    #controls #time li#time-required {
+        vertical-align: middle;
+        border-radius: 4rem;
+        padding: 2rem 2rem 0;
+        line-height: 1.2;
     }
 }
 
 @media all and (orientation:landscape) { 
   /* Style adjustments for landscape mode goes here */
-    #minutes-free  {
-        font-size: 25em;
-    }
-    
-    .events-upcoming-1 #minutes-free {
-        padding-top: 0.2em;
-        font-size: 23em;
-    }
-    
     .events-upcoming-0 #minutes-free {
-        padding-top: 0.2em;
-        font-size: 30em;
+        font-size: 100rem;
     }
-    
-    .event {
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
+
+    .events-upcoming-1 .events ,
+    .events-upcoming-1 #minutes-free {
         display: inline-block;
-        width: 50%;
-        font-size: 2.5em;
+        vertical-align: middle;
     }
-    .event:first-child  {
-        padding: 0 0.2em 1.2em 0.8em;
+    .events-upcoming-1 #minutes-free {
+        width: 40%;
+        font-size: 50rem;
+        line-height: 100rem;
     }
-    .event:last-child {
-        padding: 0 0.8em 1.2em 0.2em;
+    .events-upcoming-1 .events {
+        width: 60%;
     }
-  
-}
-
-/* Grade-A Mobile Browsers (Opera Mobile, iPhone Safari, Android Chrome)  
-   Consider this: www.cloudfour.com/css-media-query-for-mobile-is-fools-gold/ */
-@media screen and (max-device-width: 480px) {
+    .events-upcoming-1 .event {
+        font-size: 10rem;
+    }
     
-#info p,
-#controls p {
-    font-size: 1.5em;
-}
-
-#controls #time li.time-adjust {
-    font-size:1.5em;
-}
-
-#controls #time li#time-required {
-    font-size:3em;
-}    
-
-#close {
-    top: 1em;
-}
-
-#rooms-list {
-    margin-left: 10px;
-}
-#rooms-list li {
-    font-size: 0.5em;
-}
+    #status.events-upcoming-2 {
+        box-sizing: border-box;
+        padding-top: 25rem;
+    }
+    .events-upcoming-2 #minutes-free  {
+        font-size: 25rem;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+    .events-upcoming-2 .events {
+        height: 100%;
+    }
+    .events-upcoming-2 .event {
+        font-size: 10rem;
+        display: inline-block;
+        vertical-align: top;
+        width: 50%;
+        height: 100%;
+        padding: 0 0 15rem;
+        margin-bottom: 1.2rem;
+        position: relative;
+    }
+    .events-upcoming-2 .event .which {
+        margin-bottom: 0.5em;
+    }
+    .events-upcoming-2 .event .title {
+        white-space: normal;
+        /*2 lines + room for descenders*/
+        max-height: 2.5em; 
+        line-height: 1.1;
+    }
+    .events-upcoming-2 .event .when {
+        position: absolute;
+        bottom: 10rem;
+        box-sizing: border-box;
+    }
+    .events-upcoming-2 .event:first-child  {
+        padding-right: 0.2rem;
+        padding-left: 0.8rem;
+    }
+    .events-upcoming-2 .event:last-child {
+        padding-right: 0.8rem;
+        padding-left: 0.2rem;
+    }
   
-  
-  /* Prevent iOS, WinMobile from adjusting font size */
-  html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; } 
 }
+
+/* Prevent iOS, WinMobile from adjusting font size */
+html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; } 
 

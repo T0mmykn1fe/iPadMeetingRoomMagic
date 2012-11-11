@@ -12,8 +12,13 @@ function initUi(thisRoom) {
         defaultTimeBlock =            coalesce(bookingParams.defaultBookingMinutes, 30),
         timeInterval =                coalesce(bookingParams.bookingIntervalMinutes, 15);
 
-    var enabledDays =                 coalesce(enabledPeriods.days, [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun' ]),
-        enabledTimeRange =            coalesce(enabledPeriods.timeRange, { start : '00:00', end : '24:00'  });
+    var enabledDays =                 coalesce(enabledPeriods.days, [
+                                        'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'
+                                      ]),
+        enabledTimeRange =            coalesce(enabledPeriods.timeRange, {
+                                        start : '00:00',
+                                        end   : '24:00'
+                                      });
 
     var idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30);
     
@@ -61,7 +66,7 @@ function initUi(thisRoom) {
         function minutesToDurationString(mins, isOngoing) {
             if (mins < 60) {
                 return isOngoing ?
-                    'for ' + mins + pluralize(mins, ' more min', ' more mins') :
+                    'for ' + mins + pluralize(mins, ' min', ' mins') :
                     'in ' + mins + pluralize(mins, ' min', ' mins');
             }
             if (mins > minutesLeftToday()) {
@@ -69,7 +74,7 @@ function initUi(thisRoom) {
             } else {
                 var hours = Math.floor(mins / 60);
                 return isOngoing ?
-                    'for ' + hours + pluralize(hours, '+ more hour', '+ more hours') :
+                    'for ' + hours + pluralize(hours, '+ hour', '+ hours') :
                     'in ' + hours + pluralize(hours, ' hour', ' hours');
             }
         }
@@ -660,6 +665,15 @@ function initUi(thisRoom) {
         };
     })();
     
+    // By setting the font-size to 1/100th of the body height,
+    // we can use rem as a ghetto-vh. So 100rem means 100% of the body height
+    // and we can write all our sizes in terms of the viewport height.
+    function setFontSize() {
+        $(document.documentElement)
+            .css('font-size', $(document.body).height() / 100);
+    }
+    $(window).resize(setFontSize);
+    setFontSize();
 
 
     var SleepTimer = (function() {

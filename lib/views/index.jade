@@ -1,5 +1,5 @@
 body.loading
-    p#close.hidden x
+    p#close.hidden &larr;Back
     #errormsg.hidden
     #container.status-busy
         #status
@@ -15,35 +15,28 @@ body.loading
                     h3.organizer Organizer
                     h2.title Title
                     h3.when When
-        table#booking(cellpadding="0", cellspacing="0")
-            tr
-                td
-                    #info
-                        p
-                            span#room-name
-                                | This room
-                            |  is free 
-                            span.free-at
-                                | at time-o-clock
-                            |  for 
-                            strong.time-available
-                                | ?
-                            |  minutes
+        #booking
+            p#info
+                span#room-name
+                    | This room
+                |  is free 
+                span.free-at
+                    | at time-o-clock
+                |  for 
+                strong.time-available
+                    | ?
+                |  minutes
 
-            tr
-                td#p2
-                    #controls
-                        p
-                            | Book it 
-                            span.free-at
-                            |  for?
-                        ul#time
-                            li#time-less.time-adjust
-                                | &mdash;
-                            li#time-required
-                                | 30
-                            li#time-more.time-adjust
-                                | +
+            #controls
+                p
+                    | Book it 
+                    span.free-at
+                    |  for?
+                ul#time
+                    li#time-less.time-adjust
+                    li#time-required
+                        | 30
+                    li#time-more.time-adjust
 
         section#rooms
             ul#rooms-list
