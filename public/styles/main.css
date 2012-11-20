@@ -503,7 +503,7 @@ body.disabled #container {
         height: 100%;
     }
     .events-upcoming-2 .event {
-        font-size: 10rem;
+        font-size: 8rem;
         display: inline-block;
         vertical-align: top;
         width: 50%;
@@ -515,6 +515,7 @@ body.disabled #container {
     .events-upcoming-2 .event .which {
         margin-bottom: 0.5em;
     }
+    .events-upcoming-2 .event .organizer,
     .events-upcoming-2 .event .title {
         white-space: normal;
         /*2 lines + room for descenders*/
