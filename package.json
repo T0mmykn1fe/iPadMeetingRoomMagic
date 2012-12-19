@@ -1,7 +1,7 @@
 {
   "name": "meat",
   "description": "Meeting room kiosk app for displaying meeting room schedules and booking rooms in your organization. Built against Google Apps, but other sources can be defined.",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "homepage": "https://bitbucket.org/aahmed/meat",
   "author": {
     "name": "Adam Ahmed",
