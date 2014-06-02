@@ -1,4 +1,4 @@
-# Notes on add ing a custom datasource
+# Notes on adding a custom datasource
 
 I'd love to accept PRs for other datasources than Google Apps. I haven't dedicated the time to make it an easy process yet, so it's still a little raw. If you want to add a new datasource besides Google, there are a few things you have to know.
 
