@@ -321,14 +321,19 @@ body.disabled #container {
 #rooms-list li.status-busy {
     background: #e50000;  
 }
+#rooms-list li.no-status {
+    background: #3A8AC5;
+}
 
+#rooms-list li strong {
+    vertical-align: middle;
+}
 
 #rooms-list li em,
 #rooms-list li span {
     margin-right: 0.5rem;
     min-width: 1.5rem;
     text-align: right;
-    
 }
 
 #rooms-list li em {
@@ -351,6 +356,9 @@ body.disabled #container {
 }
 #rooms-list li.status-free:before {
     content: "✓";
+}
+#rooms-list li.no-status:before {
+    content: "✪";
 }
 
 /*
