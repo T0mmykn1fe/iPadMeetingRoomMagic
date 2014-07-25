@@ -6,17 +6,25 @@
             .css('font-size', $(document.body).height() / 100);
     }
 
-    function resize(elem, size) {
-        var increment = 0.25;
-        // Set the new 'font-size' before testing
-        elem.find('strong').attr('style', 'font-size: ' + size + 'rem;');
-        // Resizing again if the right edge of the text is going outside of the box
-        if ( (elem.width() + elem.offset().left) < (elem.find('strong').width() + elem.find('strong').offset().left) ) {
-            resize(elem, size - increment);
-        }
-        // Resizing again if the text height is bigger than the box height
-        else if (elem.height() < elem.find('strong').height()) {
-            resize(elem, size - increment);
+    var resize = function(elem, startSize, currentSize, minSize) {
+        // If not reached the minimal size allowed - continue to decrease the size
+        if (currentSize >= minSize) {
+            var increment = 0.25;
+            // Set the new 'font-size' before testing
+            elem.find('strong').attr('style', 'font-size: ' + currentSize + 'rem;');
+            // Resizing again if the right edge of the text is going outside of the box
+            if ( (elem.width() + elem.offset().left) < (elem.find('strong').width() + elem.find('strong').offset().left) ) {
+                resize(elem, startSize, currentSize - increment, minSize);
+            }
+            // Resizing again if the text height is bigger than the box height
+            else if (elem.height() < elem.find('strong').height()) {
+                resize(elem, startSize, currentSize - increment, minSize);
+            }
+        } else { // If minSize reached - take the first half of the text & resize it from the beginning
+            var text = elem.find('strong').text();
+            text = text.substring(0, Math.round(text.length / 2));
+            elem.find('strong').text(text + '...');
+            resize(elem, startSize, startSize, minSize);
         }
     }
 
@@ -24,15 +32,11 @@
         var $roomsList = $('#rooms-list');
         var $rooms = $roomsList.children();
         var roomArray = $.makeArray($rooms.detach());
-        /*
         roomArray.sort(function(a, b) {
-            return $(a).attr('data-name').compareTo($(b).attr('data-name'));
+            return $(a).attr('data-name').localeCompare($(b).attr('data-name'));
         });
-        */
         $(roomArray).appendTo($roomsList);
     }
-
-
 
     $(window).resize(setFontSize);
     setFontSize();
@@ -40,17 +44,8 @@
     sortRoomList();
 
     // Calling the resizing function for this element/row/room (with a starting/max 'font-size' of 10rem)
-    var elems = $('li.no-status');
-    for (var i = 0; i < elems.length; i++) {
-        var $this = $(elems[i]);
-        resize($this, 10);
-        $this.click(function(e) {
-            var target = $( event.target );
-            if ( target.is( "strong" ) ) {
-                target = target.parent();
-            }
-            window.location = target.attr('data-link');
-            e.stopPropagation();
-        });
-    }
-
+    $('li.no-status').click(function() {
+        window.location = $(this).attr('data-link');
+    }).each(function() {
+        resize($(this), 10, 10, 4);
+    });
