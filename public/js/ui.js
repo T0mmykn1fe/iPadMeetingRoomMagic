@@ -311,7 +311,7 @@ function initUi(thisRoom) {
                         bookingDuration = Math.min(bookingDuration, Math.min(maxBookableMinutes, availability.minutesFreeFor));
                     }
                 }; 
-            })(),
+            })()
         };
     })();
         
@@ -319,6 +319,10 @@ function initUi(thisRoom) {
         var $body = $('body'),
             $close = $('#close').click(function (e) {
                 revertToPreviousStage();
+                e.stopPropagation();
+            }),
+            $else = $('#else').click(function (e) {
+                switchTo(RoomList);
                 e.stopPropagation();
             });
         
@@ -467,6 +471,7 @@ function initUi(thisRoom) {
                         $body.removeClass().addClass("show-rooms");             
                         $rooms.fadeIn('slow',function(){
                             $close.toggleClass('hidden', !thisRoom);
+                            $else.addClass('hidden');
                             $rooms.css('display', '');
                             $body.dequeue();
                         });
@@ -475,6 +480,7 @@ function initUi(thisRoom) {
                         $rooms.fadeOut('fast',function() {
                             $body.removeClass('show-rooms');
                             $close.addClass('hidden');
+                            $else.addClass('hidden');
                             $body.dequeue();
                         });
                     },
@@ -605,6 +611,7 @@ function initUi(thisRoom) {
                         $booking.fadeIn('slow',function(){
                             $booking.css('display', '');
                             $close.removeClass('hidden');
+                            $else.removeClass('hidden');
                             $body.dequeue();
                         });
                     },
@@ -612,6 +619,7 @@ function initUi(thisRoom) {
                         $booking.fadeOut('fast',function(){
                             $body.removeClass('show-booking');
                             $close.addClass('hidden');
+                            $else.addClass('hidden');
                             $body.dequeue();
                         });
                     },
