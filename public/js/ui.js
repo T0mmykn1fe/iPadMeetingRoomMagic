@@ -20,7 +20,8 @@ function initUi(thisRoom) {
                                         end   : '24:00'
                                       });
 
-    var idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30);
+    var idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30),
+        displayRoomName =             coalesce(EventManagerConfig.displayRoomName, false);
     
     var ViewModels = (function() {
 
@@ -311,7 +312,7 @@ function initUi(thisRoom) {
                         bookingDuration = Math.min(bookingDuration, Math.min(maxBookableMinutes, availability.minutesFreeFor));
                     }
                 }; 
-            })(),
+            })()
         };
     })();
         
@@ -360,6 +361,7 @@ function initUi(thisRoom) {
                     model,
                     idleTimeout,
                     $container,
+                    $roomNameTop,
                     $status,
                     $statusMinutes,
                     $events,
@@ -368,7 +370,17 @@ function initUi(thisRoom) {
                 return self = {
                     name : 'status',
                     enter : function() {
-                        $body.removeClass().addClass("show-status");    
+                        $body.removeClass().addClass("show-status");
+
+                        if (displayRoomName) {
+                            $roomNameTop.text(thisRoom.name());
+                            $roomNameTop.removeClass('hidden');
+                            $statusMinutes.addClass('pushed-down');
+                        } else {
+                            $roomNameTop.text('Room name');
+                            $roomNameTop.addClass('hidden');
+                            $roomNameTop.removeClass('pushed-down');
+                        }
                         
                         if (idleTimeout) {
                             ActivityMonitor.clearIdleHandler(idleTimeout);
@@ -384,6 +396,9 @@ function initUi(thisRoom) {
                     exit : function() {
                         $status.fadeOut('fast', function() {
                             $body.removeClass();
+                            $roomNameTop.text('Room name');
+                            $roomNameTop.addClass('hidden');
+                            $roomNameTop.removeClass('pushed-down');
                             
                             if (!idleTimeout) {
                                 idleTimeout = ActivityMonitor.setIdleHandler(idleTimeoutSec * 1000, revertToInitial);
@@ -406,6 +421,7 @@ function initUi(thisRoom) {
                             }
                             e.stopPropagation();
                         });
+                        $roomNameTop = $('#room-name-top', $status);
                         $statusMinutes = $('#minutes-free', $status);
                         $events = $('.events', $status);
                         $currentEvent = $('#current-event', $events);
