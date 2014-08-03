@@ -75,6 +75,11 @@ Room displays should hit:
 Where {roomName} is the full, case-sensitive, URL-encoded name of the room 
 they're in front of.
 
+But, if you are lazy and do not want to type the full, case-sensitive, URL-encoded name of the room,
+you can also hit the following URL & select the appropriate room to go to the URL described above:
+
+    http://example.com/setup/links
+
 If you'd like to have a display show information for all rooms by default, 
 then just hit:
 
