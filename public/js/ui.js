@@ -255,6 +255,14 @@ function initUi(thisRoom) {
                 var bookingRoom,
                     availability,
                     bookingDuration;
+
+                function maxDuration() {
+                    return Math.min(maxBookableMinutes, availability.minutesFreeFor);
+                }
+                function minDuration() {
+                    return minBookableMinutes;
+                }
+
                 return {
                     getBookingRoom : function() { return bookingRoom; },
                     getBookingRoomName : function() { return bookingRoom.simpleName(); },
@@ -265,26 +273,28 @@ function initUi(thisRoom) {
                         return availability.minutesFreeFor >= maxBookableMinutes ? maxBookableMinutes + '+' : availability.minutesFreeFor;
                     },
                     addTimeInterval : function() {
-                        bookingDuration += timeInterval;
-                        if (bookingDuration > maxBookableMinutes || bookingDuration > availability.minutesFreeFor)
-                            bookingDuration = Math.min(maxBookableMinutes, availability.minutesFreeFor);
+                        if (bookingDuration % timeInterval == 0 ) {
+                            bookingDuration += timeInterval;
+                        } else { // get us to a timeInterval multiple
+                            bookingDuration += timeInterval - (bookingDuration % timeInterval);
+                        }
+                        bookingDuration = Math.min(maxDuration(), bookingDuration);
                         return bookingDuration;
                     },
                     subtractTimeInterval : function() {
                         if (bookingDuration % timeInterval == 0 ) {
                             bookingDuration -= timeInterval;
-                        } else {
+                        } else { // get us to a timeInterval multiple
                             bookingDuration -= bookingDuration % timeInterval;
                         }
-                        if (bookingDuration < 0)
-                            bookingDuration = Math.max(minBookableMinutes, Math.min(timeInterval, availability.minutesFreeFor));
+                        bookingDuration = Math.max(minDuration(), bookingDuration);
                         return bookingDuration;
                     },
                     canAddTime : function() {
-                        return bookingDuration < Math.min(availability.minutesFreeFor, maxBookableMinutes);
+                        return bookingDuration < maxDuration();
                     },
                     canSubtractTime : function() {
-                        return bookingDuration > timeInterval;
+                        return bookingDuration > minDuration();
                     },
                     getBookingDuration : function () {
                         return bookingDuration;
@@ -295,7 +305,7 @@ function initUi(thisRoom) {
                         return date;
                     },
                     canBook : function() {
-                        return bookingDuration >= minBookableMinutes && bookingDuration <= Math.min(availability.minutesFreeFor, maxBookableMinutes);
+                        return bookingDuration >= minDuration() && bookingDuration <= maxDuration();
                     },
                     setRoom : function(room) {
                         bookingRoom = room;

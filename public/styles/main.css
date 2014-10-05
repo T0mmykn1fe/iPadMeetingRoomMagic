@@ -328,7 +328,8 @@ body.disabled #container {
     border-radius: 5rem;
     padding: 2rem 2rem 0;
     line-height: 1.2;
-    
+    min-width: 1.4em;
+    text-align: center;
 }
 
 
