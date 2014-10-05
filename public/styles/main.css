@@ -82,7 +82,8 @@ button.link-button:focus {
 
 /* end html5doctor.com Reset Stylesheet */
 
-#close {
+#close,
+#find-other-rooms {
     cursor: pointer;
     position: absolute;
     top: 4rem;
@@ -91,6 +92,7 @@ button.link-button:focus {
     line-height: 1;
     text-decoration: none;
     font-weight: bold;
+    z-index: 1; /* fighting with #minutes-free :( */
 }
 
 html,

@@ -321,6 +321,10 @@ function initUi(thisRoom) {
             $close = $('#close').click(function (e) {
                 revertToPreviousStage();
                 e.stopPropagation();
+            }),
+            $findOtherRooms = $('#find-other-rooms').click(function (e) {
+                switchTo(RoomList);
+                e.stopPropagation();
             });
         
         var currStage,
@@ -371,6 +375,7 @@ function initUi(thisRoom) {
                     name : 'status',
                     enter : function() {
                         $body.removeClass().addClass("show-status");
+                        $findOtherRooms.removeClass('hidden');
                         $roomNameTop.text(thisRoom.name());
                         $roomNameTop.toggleClass('hidden', !displayRoomName);
                         $status.toggleClass('showing-room-name', displayRoomName);
@@ -389,6 +394,7 @@ function initUi(thisRoom) {
                         $status.fadeOut('fast', function() {
                             $body.removeClass();
                             $roomNameTop.addClass('hidden');
+                            $findOtherRooms.addClass('hidden');
                             
                             if (!idleTimeout) {
                                 idleTimeout = ActivityMonitor.setIdleHandler(idleTimeoutSec * 1000, revertToInitial);
@@ -475,6 +481,7 @@ function initUi(thisRoom) {
                         $body.removeClass().addClass("show-rooms");             
                         $rooms.fadeIn('slow',function(){
                             $close.toggleClass('hidden', !thisRoom);
+                            $findOtherRooms.addClass('hidden');
                             $rooms.css('display', '');
                             $body.dequeue();
                         });
@@ -613,6 +620,7 @@ function initUi(thisRoom) {
                         $booking.fadeIn('slow',function(){
                             $booking.css('display', '');
                             $close.removeClass('hidden');
+                            $findOtherRooms.addClass('hidden');
                             $body.dequeue();
                         });
                     },
