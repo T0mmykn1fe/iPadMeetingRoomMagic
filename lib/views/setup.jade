@@ -3,8 +3,8 @@ body
         section#rooms
             ul#rooms-list
                 each room in rooms
-                    li.no-status(id=room.key, data-link=room.url, data-name=room.name)
-                        strong #{room.name}
+                    li.no-status
+                        a(href=room.url) #{room.name}
 
     script(src="/js/jquery-1.5.1.min.js")
     script(src="/js/underscore-min.js")

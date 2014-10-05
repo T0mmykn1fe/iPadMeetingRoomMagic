@@ -493,17 +493,17 @@ function initUi(thisRoom) {
                         self.reset();
                     },
                     createRow : function(rowModel) {
-                        var $row = $('<li><strong></strong></li>');
+                        var $row = $('<li><button type="button" class="link-button"></button></li>');
                         $row
                             .attr('id', rowModel.getHtmlId())
                             .data('model', rowModel)
-                            .find('strong')
-                                .text(rowModel.getDisplayName());
-                        $row.click(function(e) {
-                            Book.setRoom(rowModel.getRoom());
-                            switchTo(Book);
-                            e.stopPropagation();
-                        });
+                            .children('button')
+                                .text(rowModel.getDisplayName())
+                                .click(function(e) {
+                                    Book.setRoom(rowModel.getRoom());
+                                    switchTo(Book);
+                                    e.stopPropagation();
+                                });
                         $roomsList.append($row);
                         self.updateRow(rowModel);
                         sortRoomList();
@@ -545,7 +545,7 @@ function initUi(thisRoom) {
                                 onComplete = function() {
                                 };
                             $timeRequired
-                                .text("Booked")
+                                .children('button').text("Booked").end()
                                 .siblings()
                                     .addClass('hidden')
                                 .end()
@@ -580,7 +580,7 @@ function initUi(thisRoom) {
                     }
                     function onMoreTimeClicked(e) {
                         if (!$timeMore.hasClass('disabled')) {
-                            $timeRequired.text(model.addTimeInterval());
+                            $timeRequired.children('button').text(model.addTimeInterval());
                             $timeMore.toggleClass('disabled', !model.canAddTime());
                             $timeLess.toggleClass('disabled', !model.canSubtractTime());
                         }
@@ -589,7 +589,7 @@ function initUi(thisRoom) {
                     }
                     function onLessTimeClicked(e) {
                         if (!$timeLess.hasClass('disabled')) {
-                            $timeRequired.text(model.subtractTimeInterval());
+                            $timeRequired.children('button').text(model.subtractTimeInterval());
                             $timeMore.toggleClass('disabled', !model.canAddTime());
                             $timeLess.toggleClass('disabled', !model.canSubtractTime());
                         }
@@ -622,7 +622,7 @@ function initUi(thisRoom) {
                             if (model.getBookingRoom()) {
                                 model.updateTimes();
                                 $timeAvailable.text(model.getTimeAvailableString());
-                                $timeRequired.text(model.getBookingDuration()).toggleClass('disabled', !model.canBook());
+                                $timeRequired.children('button').text(model.getBookingDuration()).toggleClass('disabled', !model.canBook());
                                 $freeAt.text(model.getTimeFreeAtString());
                             }
                         });
@@ -630,11 +630,15 @@ function initUi(thisRoom) {
                         $booking = $root;
                         
                         $timeAvailable = $('#info .time-available', $root);
-                        $timeRequired = $("#time-required", $root).click(onTimeRequiredClicked);
-                        $timeMore = $("#time-more", $root).click(onMoreTimeClicked);
-                        $timeLess = $("#time-less", $root).click(onLessTimeClicked);
+                        $timeRequired = $("#time-required", $root);
+                        $timeMore = $("#time-more", $root);
+                        $timeLess = $("#time-less", $root)
                         $roomName = $('#room-name', $root);
                         $freeAt = $('.free-at', $root);
+
+                        $timeRequired.children('button').click(onTimeRequiredClicked);
+                        $timeMore.children('button').click(onMoreTimeClicked);
+                        $timeLess.children('button').click(onLessTimeClicked);
                     },
                     setRoom : function(room) {
                         model.setRoom(room);
@@ -642,7 +646,7 @@ function initUi(thisRoom) {
                     reset : function() {
                         $roomName.text(model.getBookingRoomName());
                         $timeAvailable.text(model.getTimeAvailableString());
-                        $timeRequired.removeClass('disabled').text(model.getBookingDuration());
+                        $timeRequired.removeClass('disabled').children('button').text(model.getBookingDuration());
                         $freeAt.text(model.getTimeFreeAtString());
                         $timeMore.removeClass('hidden').toggleClass('disabled', !model.canAddTime());
                         $timeLess.removeClass('hidden').toggleClass('disabled', !model.canSubtractTime());

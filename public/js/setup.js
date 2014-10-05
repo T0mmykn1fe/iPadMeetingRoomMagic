@@ -8,7 +8,3 @@
 
     $(window).resize(setFontSize);
     setFontSize();
-
-    $('li.no-status').click(function() {
-        window.location = $(this).attr('data-link');
-    });

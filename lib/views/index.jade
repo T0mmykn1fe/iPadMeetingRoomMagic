@@ -1,5 +1,5 @@
 body.loading
-    p#close.hidden &larr;Back
+    button#close.link-button.hidden &larr; Back
     #errormsg.hidden
     #container.status-busy
         #status
@@ -34,9 +34,12 @@ body.loading
                     |  for?
                 ul#time
                     li#time-less.time-adjust
+                        button.link-button(type="button")
                     li#time-required
-                        | 30
+                        button.link-button(type="button")
+                            | 30
                     li#time-more.time-adjust
+                        button.link-button(type="button")
 
         section#rooms
             ul#rooms-list
