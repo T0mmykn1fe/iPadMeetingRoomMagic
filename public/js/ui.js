@@ -217,7 +217,7 @@ function initUi(thisRoom) {
                             bFreeMinutes = bBookedAt ? minutesBetween(bNextFree, bBookedAt) : Infinity;
                     
                         if (aFreeMinutes == bFreeMinutes || (aFreeMinutes > maxBookableMinutes && bFreeMinutes > maxBookableMinutes)) {
-                            return aRoom.name() < bRoom.name() ? -1 : 1;
+                            return aRoom.name().toLowerCase().localeCompare(bRoom.name().toLowerCase());
                         } else {
                             return aFreeMinutes > bFreeMinutes ? -1 : 1;
                         }

@@ -88,15 +88,17 @@ button.link-button:focus {
     cursor: pointer;
     position: absolute;
     top: 4rem;
-    left: 4rem;
     font-size: 5rem;
     line-height: 1;
     text-decoration: none;
     font-weight: bold;
     z-index: 1; /* fighting with #minutes-free :( */
 }
+#close,
+#find-other-rooms {
+    left: 4rem;
+}
 #book-me {
-    left: auto;
     right: 4rem;
 }
 
@@ -115,6 +117,7 @@ body {
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
+    position: relative;
 }
 @-webkit-keyframes rotate {
     from {
@@ -406,7 +409,13 @@ body.disabled #container {
     #book-me {
         font-size: 3rem;
         top: 3rem;
+    }
+    #close,
+    #find-other-rooms {
         left: 3rem;
+    }
+    #book-me {
+        right: 3rem;
     }
 
     .events-upcoming-0 #minutes-free  {
