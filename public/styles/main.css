@@ -83,7 +83,8 @@ button.link-button:focus {
 /* end html5doctor.com Reset Stylesheet */
 
 #close,
-#find-other-rooms {
+#find-other-rooms,
+#book-me {
     cursor: pointer;
     position: absolute;
     top: 4rem;
@@ -93,6 +94,10 @@ button.link-button:focus {
     text-decoration: none;
     font-weight: bold;
     z-index: 1; /* fighting with #minutes-free :( */
+}
+#book-me {
+    left: auto;
+    right: 4rem;
 }
 
 html,
@@ -396,7 +401,9 @@ body.disabled #container {
 
 @media all and (orientation:portrait) { 
 
-    #close {
+    #close,
+    #find-other-rooms,
+    #book-me {
         font-size: 3rem;
         top: 3rem;
         left: 3rem;

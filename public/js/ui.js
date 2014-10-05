@@ -317,15 +317,16 @@ function initUi(thisRoom) {
     })();
         
     var Stages = (function() {
-        var $body = $('body'),
-            $close = $('#close').click(function (e) {
+        var $body = $('body');
+        var $close = $('#close').click(function (e) {
                 revertToPreviousStage();
                 e.stopPropagation();
-            }),
-            $findOtherRooms = $('#find-other-rooms').click(function (e) {
+            });
+        var $findOtherRooms = $('#find-other-rooms').click(function (e) {
                 switchTo(RoomList);
                 e.stopPropagation();
             });
+        var $bookMe = $('#book-me');
         
         var currStage,
             prevStages = [ ];
@@ -395,6 +396,7 @@ function initUi(thisRoom) {
                             $body.removeClass();
                             $roomNameTop.addClass('hidden');
                             $findOtherRooms.addClass('hidden');
+                            $bookMe.addClass('hidden');
                             
                             if (!idleTimeout) {
                                 idleTimeout = ActivityMonitor.setIdleHandler(idleTimeoutSec * 1000, revertToInitial);
@@ -408,7 +410,9 @@ function initUi(thisRoom) {
                         model.setRoom(thisRoom);
                         
                         $container = $theContainer;
-                        $status = $('#status', $container).click(function(e) {
+                        $status = $('#status', $container);
+
+                        $status.add($bookMe).click(function(e) {
                             if (!model.getCurrentBooking()) {
                                 Book.setRoom(model.getRoom());
                                 switchTo(Book);
@@ -452,6 +456,8 @@ function initUi(thisRoom) {
                                 .removeClass()
                                 .addClass(model.getRoomStatusClassString());
                             
+                            $bookMe.toggleClass('hidden', !!model.getCurrentBooking());
+
                             updateEventDOM($currentEvent, model.getCurrentBooking());
                             updateEventDOM($nextEvent, model.getNextBooking());
                             $status.removeClass(eventsUpcomingClasses.join(' ')).addClass("events-upcoming-" + model.getDisplayedBookingCount());
@@ -481,7 +487,6 @@ function initUi(thisRoom) {
                         $body.removeClass().addClass("show-rooms");             
                         $rooms.fadeIn('slow',function(){
                             $close.toggleClass('hidden', !thisRoom);
-                            $findOtherRooms.addClass('hidden');
                             $rooms.css('display', '');
                             $body.dequeue();
                         });
@@ -620,7 +625,6 @@ function initUi(thisRoom) {
                         $booking.fadeIn('slow',function(){
                             $booking.css('display', '');
                             $close.removeClass('hidden');
-                            $findOtherRooms.addClass('hidden');
                             $body.dequeue();
                         });
                     },
