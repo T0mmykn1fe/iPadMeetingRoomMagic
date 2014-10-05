@@ -323,11 +323,7 @@ body.disabled #container {
 }
 #rooms-list li.no-status {
     background: #3A8AC5;
-}
-
-#rooms-list li strong {
-    vertical-align: middle;
-}
+}   
 
 #rooms-list li em,
 #rooms-list li span {
@@ -353,7 +349,6 @@ body.disabled #container {
     display: inline-block;
     width: 1.1em;
     text-align: center;
-    vertical-align: middle;
 }
 #rooms-list li.status-free:before {
     content: "✓";
