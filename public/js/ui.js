@@ -20,7 +20,8 @@ function initUi(thisRoom) {
                                         end   : '24:00'
                                       });
 
-    var idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30);
+    var idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30),
+        displayRoomName =             coalesce(EventManagerConfig.displayRoomName, false);
     
     var ViewModels = (function() {
 
@@ -311,7 +312,7 @@ function initUi(thisRoom) {
                         bookingDuration = Math.min(bookingDuration, Math.min(maxBookableMinutes, availability.minutesFreeFor));
                     }
                 }; 
-            })(),
+            })()
         };
     })();
         
@@ -360,6 +361,7 @@ function initUi(thisRoom) {
                     model,
                     idleTimeout,
                     $container,
+                    $roomNameTop,
                     $status,
                     $statusMinutes,
                     $events,
@@ -368,8 +370,10 @@ function initUi(thisRoom) {
                 return self = {
                     name : 'status',
                     enter : function() {
-                        $body.removeClass().addClass("show-status");    
-                        
+                        $body.removeClass().addClass("show-status");
+                        $roomNameTop.text(thisRoom.name());
+                        $roomNameTop.toggleClass('hidden', !displayRoomName);
+                        $status.toggleClass('showing-room-name', displayRoomName);
                         if (idleTimeout) {
                             ActivityMonitor.clearIdleHandler(idleTimeout);
                             idleTimeout = null;
@@ -384,6 +388,7 @@ function initUi(thisRoom) {
                     exit : function() {
                         $status.fadeOut('fast', function() {
                             $body.removeClass();
+                            $roomNameTop.addClass('hidden');
                             
                             if (!idleTimeout) {
                                 idleTimeout = ActivityMonitor.setIdleHandler(idleTimeoutSec * 1000, revertToInitial);
@@ -406,6 +411,7 @@ function initUi(thisRoom) {
                             }
                             e.stopPropagation();
                         });
+                        $roomNameTop = $('#room-name-top', $status);
                         $statusMinutes = $('#minutes-free', $status);
                         $events = $('.events', $status);
                         $currentEvent = $('#current-event', $events);
@@ -432,6 +438,9 @@ function initUi(thisRoom) {
                                 $eventDOM.detach();
                             }
                         }
+                        var eventsUpcomingClasses = [0,1,2].map(function(n) {
+                            return 'events-upcoming-' + n;
+                        });
                         return function() {
                             $container
                                 .removeClass()
@@ -439,8 +448,7 @@ function initUi(thisRoom) {
                             
                             updateEventDOM($currentEvent, model.getCurrentBooking());
                             updateEventDOM($nextEvent, model.getNextBooking());
-                            
-                            $status.removeClass().addClass("events-upcoming-" + model.getDisplayedBookingCount());
+                            $status.removeClass(eventsUpcomingClasses.join(' ')).addClass("events-upcoming-" + model.getDisplayedBookingCount());
                         };
                     })()
                 };

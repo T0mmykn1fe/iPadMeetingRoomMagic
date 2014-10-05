@@ -182,9 +182,21 @@ body.disabled #container {
     position: relative;
 }
 
+#room-name-top {
+    background-color: #000;
+    height: 7rem;
+    line-height: 7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 #minutes-free {
     overflow: hidden;
     max-height: 100%;
+}
+.showing-room-name #minutes-free {
+    max-height: 93%;
 }
 
 #minutes-free:after {
@@ -399,6 +411,9 @@ body.disabled #container {
         height: 70rem;
         padding: 0;
     }
+    .showing-room-name.events-upcoming-1 .events {
+        height: 63rem;
+    }
     .events-upcoming-1 .event {
         height: 100%;
         padding: 12rem 0 0;
@@ -420,14 +435,14 @@ body.disabled #container {
         height: 80rem;
         padding: 0;
     }
+    .showing-room-name.events-upcoming-2 .events {
+        height: 73rem;
+    }
     .events-upcoming-2 .event {
         height: 50%;
         padding: 4rem 0 0;
         font-size: 6rem;
         box-sizing: border-box;
-    }
-    .events-upcoming-2 .which {
-        margin-bottom: 2rem;
     }
 
     #rooms-list {
@@ -514,17 +529,19 @@ body.disabled #container {
     
     #status.events-upcoming-2 {
         box-sizing: border-box;
-        padding-top: 25rem;
     }
     .events-upcoming-2 #minutes-free  {
         font-size: 25rem;
-        position: absolute;
-        top: 0;
         width: 100%;
     }
+
     .events-upcoming-2 .events {
-        height: 100%;
+        height: 75%;
     }
+    .showing-room-name.events-upcoming-2 .events {
+        height: 68%;
+    }
+
     .events-upcoming-2 .event {
         font-size: 8rem;
         display: inline-block;
@@ -532,7 +549,6 @@ body.disabled #container {
         width: 50%;
         height: 100%;
         padding: 0 0 15rem;
-        margin-bottom: 1.2rem;
         position: relative;
     }
     .events-upcoming-2 .event .which {
