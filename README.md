@@ -103,6 +103,9 @@ Note: there is little to no security in MEAT. If your Google Apps information ne
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](https://github.com/cowboy/grunt).
 
 ## Release History
+* 0.3.2 - Fix LICENSE link in package.json
+* 0.3.1 - Set preferGlobal
+* 0.3.0 - Fix private meetings, add option to display the room name, add ability to see full room list from status page, add "Book me" link for some call-to-action on the status screen, /setup URL for getting links to each room quickly, accessibility improvements.
 * 0.2.4 - Fix bug when handling errors during a Booking.
 * 0.2.3 - Better styling of the UI. Switch 'X' to 'Back' link
 * 0.2.2 - Better datasource logging. Fix bug where timeout when loading events for the last room would cause event info to stop being updated.
