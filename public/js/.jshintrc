@@ -1,0 +1,27 @@
+{
+    "curly": true,
+    "eqeqeq": true,
+    "immed": true,
+    "latedef": true,
+    "newcap": true,
+    "noarg": true,
+    "sub": true,
+    "undef": true,
+    "boss": true,
+    "eqnull": true,
+    "browser": true,
+    "jquery": true,
+    "strict": false,
+    "globals": {
+        "_" : false,
+        "ActivityMonitor" : false,
+        "DebugSettings" : false,
+        "EventManager" : false,
+        "EventManagerConfig" : false,
+        "GlobalEvents" : false,
+        "Logger": false,
+        "ParameterParser": false,
+        "UI": false,
+        "console": false
+    }
+}

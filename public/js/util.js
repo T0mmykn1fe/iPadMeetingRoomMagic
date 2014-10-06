@@ -1,3 +1,4 @@
+/* globals GlobalEvents: true, ParameterParser: true, Logger : true, DebugSettings: true, ActivityMonitor: true */
 
 var GlobalEvents = (function() {
     var eventNamespace = ".meatevent";  
@@ -15,8 +16,8 @@ var GlobalEvents = (function() {
     };
 })();
 
-var ParameterParser = new (function() {
-    this.parse = function() {
+var ParameterParser = {
+    parse : function() {
         var hashTag = window.location.hash.substr(1),
             qsParams = window.location.search.substr(1),
             vars = hashTag.split('&').concat(qsParams.split('&')),
@@ -30,17 +31,17 @@ var ParameterParser = new (function() {
         }
         
         return params;
-    };
-
-    return this;
-})();
+    }
+};
 
 var Logger = (function(){
     var vars = ParameterParser.parse();
 
     return {
         log: function(msg, errObj) {
-            msg && console.log(msg);
+            if (msg) {
+                console.log(msg);
+            }
             throw errObj;
         }
     };
@@ -59,7 +60,7 @@ var ActivityMonitor = (function() {
             timeoutIndex = 0;
             idleCallback();
         } catch (e) {
-            Logger.log("Error in idle recording.", e)
+            Logger.log("Error in idle recording.", e);
         }
     }
     function idleCallback() {
@@ -103,7 +104,7 @@ var ActivityMonitor = (function() {
                 }
                 i++;
             }               
-            if (i == l) {
+            if (i === l) {
                 timeouts.push({
                         idleMs: idleMs,
                         handler: handler,
@@ -116,8 +117,10 @@ var ActivityMonitor = (function() {
         },
         clearIdleHandler : function(idleTimeoutHandle) {
             for (var i = 0, l = timeouts.length; i < l; i++) {
-                if(idleTimeoutHandle == timeouts[i].timeoutHandle) {
-                    if (i < timeoutIndex) timeoutIndex--;
+                if(idleTimeoutHandle === timeouts[i].timeoutHandle) {
+                    if (i < timeoutIndex) {
+                        timeoutIndex--;
+                    }
                     timeouts.splice(i, 1);
                     break;
                 }

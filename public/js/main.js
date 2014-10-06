@@ -9,7 +9,9 @@
         midnight.setSeconds(0); midnight.setMinutes(0);midnight.setHours(0);
         
         // paranoia
-        while (midnight < new Date()) midnight = new Date(midnight.getTime() + oneDay);
+        while (midnight < new Date()) {
+            midnight = new Date(midnight.getTime() + oneDay);
+        }
         
         setTimeout(func, midnight - new Date());
     }
@@ -69,7 +71,7 @@
             return;
         }
             
-        initUi(thisRoom);
+        UI.init(thisRoom);
         
         _.each(newRooms, function(room) {
             GlobalEvents.trigger('roomLoaded', room);

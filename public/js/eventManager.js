@@ -1,3 +1,4 @@
+/*globals EventManager: true */
 var EventManager = (function() {
     var TimeRange = function(start, end) {
         this.start = start;
@@ -5,12 +6,14 @@ var EventManager = (function() {
     };
     TimeRange.prototype = {
         toString : function() {
-            if (this.start.getDay() == this.end.getDay())
+            if (this.start.getDay() === this.end.getDay()) {
                 return this.start.toDateString() + '(' + 
                     this.start.getHours() + ':' + this.start.getMinutes() + ' - ' + 
                     this.end.getHours() + ':' + this.end.getMinutes() + ')';
-            else
+            }
+            else {
                 return '(' + this.start.toString() + ' - ' + this.end.toString() + ')';
+            }
         },
         intersects : function(dateOrRange) {
             return (dateOrRange instanceof Date) ?
@@ -212,7 +215,7 @@ var EventManager = (function() {
         return rooms;
     };
 
-    return new (function () {
+    function EventManagerCtor() {
         var url;
         var secretKey;
 
@@ -300,5 +303,8 @@ var EventManager = (function() {
             
             return bookRoom(room.id(), startTime.toISOString(), endTime.toISOString(), onSuccess, onError);
         };
-    })();
+    }
+
+    // TODO - remove the lame capitalized globals so I don't have to name this Ctor something stupid.
+    return new EventManagerCtor();
 })();
