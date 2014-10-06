@@ -1,7 +1,7 @@
 {
   "name": "meat",
   "description": "Meeting room kiosk app for displaying meeting room schedules and booking rooms in your organization. Built against Google Apps, but other sources can be defined.",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "homepage": "https://bitbucket.org/aahmed/meat",
   "author": {
     "name": "Adam Ahmed",
@@ -9,11 +9,11 @@
     "url": "http://www.noiregrets.com"
   },
   "repository": {
-    "type": "hg",
-    "url": "ssh://hg@bitbucket.org/aahmed/meat"
+    "type": "git",
+    "url": "https://bitbucket.org/aahmed/meat.git"
   },
   "bugs": {
-    "url": "https://labs.atlassian.com/browse/MEAT"
+    "url": "https://bitbucket.org/aahmed/meat/issues"
   },
   "licenses": [
     {
