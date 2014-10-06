@@ -362,6 +362,8 @@ body.disabled #container {
     height: 100%;
     color: inherit;
     text-decoration: none;
+    -webkit-box-sizing: border-box; /* Android 2.3 actually has 1% of the market. */
+    box-sizing: border-box;
 }
 #rooms-list li.status-free > button,
 #rooms-list li.status-free > a {
