@@ -24,16 +24,16 @@ Download it from http://nodejs.org/
 
 ### Step 3: Store your data
 
-The Node server requires a directory for saving configuration, logs and other data. Specify a directory using the environment variable `$MEAT_HOME`
+The Node server requires a directory for saving configuration, logs and other data. Specify an empty directory using the environment variable `$MEAT_HOME`
 
 On *nix:
 ```
-> export MEAT_HOME=/path/to/MEAT
+> export MEAT_HOME=/path/to/meat-data
 ```
 
 On Windows:
 ```
-> set MEAT_HOME=C:\path\to\MEAT
+> set MEAT_HOME=C:\path\to\meat-data
 ```
 
 ### Step 3: First run
