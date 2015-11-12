@@ -38,8 +38,8 @@ var EventManager = (function() {
     function CalendarEvent(jsonOrEvent) {
         TimeRange.call(this, new Date(jsonOrEvent.start), new Date(jsonOrEvent.end));
 
-        this._title = jsonOrEvent._title || jsonOrEvent.title || 'Unnamed Event';
-        this._organizer = jsonOrEvent._organizer || jsonOrEvent.organizer;
+        this._title = jsonOrEvent._title || ((typeof jsonOrEvent.title) === "function" ? jsonOrEvent.title() : jsonOrEvent.title) || 'Unnamed Event';
+        this._organizer = jsonOrEvent._organizer || ((typeof jsonOrEvent.organizer) === "function" ? jsonOrEvent.organizer() : jsonOrEvent.organizer) || "Unknown Organizer";
     }
     $.extend(CalendarEvent.prototype, TimeRange.prototype, {
         conflictsWith : function (date) {
