@@ -1,6 +1,6 @@
 /* globals UI : true */
 var UI = {
-    init : function initUi(thisRoom) { 
+    init : function initUi(thisRoom) {
         function coalesce(a,b) { return a == null ? b : a; }
         var bookingParams = EventManagerConfig.bookingParameters || {};
         var enabledPeriods = EventManagerConfig.enabledPeriod || {};
@@ -22,7 +22,7 @@ var UI = {
 
         var idleTimeoutSec =              coalesce(EventManagerConfig.idleTimeoutSeconds, 30),
             displayRoomName =             coalesce(EventManagerConfig.displayRoomName, false);
-        
+
         var ViewModels = (function() {
 
             function pluralize(num, one, many) {
@@ -32,14 +32,14 @@ var UI = {
             function minutesBetween(a, b) {
                 return Math.ceil((b.getTime() - a.getTime()) / 60000);
             }
-        
+
             function timeBetweenString(a, b, prefix) {
                 if (!a || !b) {
                     return "";
                 }
-                
+
                 var minutes = minutesBetween(a, b);
-                
+
                 if (minutes < 1) {
                     return "";
                 } else if (minutes < 60) {
@@ -79,7 +79,7 @@ var UI = {
                         'in ' + hours + pluralize(hours, ' hour', ' hours');
                 }
             }
-            
+
             function getRoomAvailability(room) {
                 var now = DebugSettings.now() || new Date(),
                     bookings = room.upcomingBookings(now),
@@ -90,7 +90,7 @@ var UI = {
                         freeAt : now,
                         minutesFreeFor : Infinity
                     };
-                    
+
                 if (bookings.length) {
                     var bIndex = 0;
                     var next = bookings[bIndex];
@@ -112,7 +112,7 @@ var UI = {
                             minutesTilEnd : minutesBetween(now, next.end)
                         };
                     }
-                    
+
                     var freeTime = now, freeMinutes;
                     next = bookings.shift();
                     while(next && minutesBetween(freeTime, next.start) < minBookableMinutes) {
@@ -125,10 +125,10 @@ var UI = {
                         availability.minutesFreeFor = minutesBetween(freeTime, next.start);
                     }
                 }
-                
+
                 return availability;
             }
-        
+
             function getStatusClassString(minutesFreeIn, minutesFreeFor) {
                 return (
                         minutesFreeIn <= 0 ?
@@ -144,7 +144,7 @@ var UI = {
                             'freetime-long'
                     );
             }
-                
+
             return {
                 thisRoom : (function() {
                     var room;
@@ -189,7 +189,7 @@ var UI = {
                 })(),
                 otherRooms : (function() {
                     var rows = {};
-                    
+
                     function htmlEscape(str) {
                         return str ? str.replace(/'"`<>/g, function(c) {
                             switch(c) {
@@ -202,7 +202,7 @@ var UI = {
                             }
                         }) : str;
                     }
-                    
+
                     function rowCompareTo(otherRow) {
                         var now = DebugSettings.now() || new Date(),
                             aRoom = this.getRoom(),
@@ -211,7 +211,7 @@ var UI = {
                             bNextFree = bRoom.nextFreeTime(now),
                             aMinutesToFree = minutesBetween(now, aNextFree),
                             bMinutesToFree = minutesBetween(now, bNextFree);
-                        
+
                         //free at the same time
                         if (aMinutesToFree === bMinutesToFree) {
                             //how long for?
@@ -219,7 +219,7 @@ var UI = {
                                 bBookedAt = bRoom.nextEventTime(bNextFree),
                                 aFreeMinutes = aBookedAt ? minutesBetween(aNextFree, aBookedAt) : Infinity,
                                 bFreeMinutes = bBookedAt ? minutesBetween(bNextFree, bBookedAt) : Infinity;
-                        
+
                             if (aFreeMinutes === bFreeMinutes || (aFreeMinutes > maxBookableMinutes && bFreeMinutes > maxBookableMinutes)) {
                                 return aRoom.name().toLowerCase().localeCompare(bRoom.name().toLowerCase());
                             } else {
@@ -229,15 +229,15 @@ var UI = {
                             //one is free first
                             return aMinutesToFree < bMinutesToFree ? -1 : 1;
                         }
-                        
+
                     }
-                    
+
                     return {
                         createRoomRowViewModel : function(room) {
                             if (rows.hasOwnProperty(room.id())) {
                                 throw new Error("A row has already been created for room " + room.simpleName() + " (ID: " + room.id() + ")");
                             }
-                            
+
                             return rows[room.id()] = {
                                     sync : function() {},
                                     getHtmlId : function() { return htmlEscape(room.id()); },
@@ -325,11 +325,11 @@ var UI = {
                             availability = getRoomAvailability(bookingRoom);
                             bookingDuration = Math.min(bookingDuration, Math.min(maxBookableMinutes, availability.minutesFreeFor));
                         }
-                    }; 
+                    };
                 })()
             };
         })();
-            
+
         var Stages = (function() {
             var $body = $('body');
             var $close = $('#close').click(function (e) {
@@ -341,15 +341,15 @@ var UI = {
                     e.stopPropagation();
                 });
             var $bookMe = $('#book-me');
-            
+
             var currStage,
                 prevStages = [ ];
-            
+
             function switchTo(newStage, asRevert) {
                 if (newStage && currStage !== Switching && currStage !== newStage) {
                     var prevStage = currStage;
                     currStage = Switching;
-                    
+
                     if (prevStage) {
                         // If we're switching "backwards", don't push the current stage onto the stack
                         if (!asRevert) {
@@ -357,7 +357,7 @@ var UI = {
                         }
                         $body.queue(prevStage.exit);
                     }
-                    
+
                     $body.queue(newStage.enter).queue(function() {
                         currStage = newStage;
                         $body.dequeue();
@@ -376,7 +376,7 @@ var UI = {
                 prevStages = prevStages.slice(0, 1);
                 revertToPreviousStage();
             }
-        
+
             var Status = (function() {
                     var self,
                         model,
@@ -400,7 +400,7 @@ var UI = {
                                 ActivityMonitor.clearIdleHandler(idleTimeout);
                                 idleTimeout = null;
                             }
-                            
+
                             self.update();
                             $status.fadeIn('slow', function() {
                                 $status.css('display', '');
@@ -413,18 +413,18 @@ var UI = {
                                 $roomNameTop.addClass('hidden');
                                 $findOtherRooms.addClass('hidden');
                                 $bookMe.addClass('hidden');
-                                
+
                                 if (!idleTimeout) {
                                     idleTimeout = ActivityMonitor.setIdleHandler(idleTimeoutSec * 1000, revertToInitial);
                                 }
-                                
+
                                 $body.dequeue();
                             });
                         },
                         init : function($theContainer, thisRoom) {
                             model = ViewModels.thisRoom;
                             model.setRoom(thisRoom);
-                            
+
                             $container = $theContainer;
                             $status = $('#status', $container);
 
@@ -442,7 +442,7 @@ var UI = {
                             $events = $('.events', $status);
                             $currentEvent = $('#current-event', $events);
                             $nextEvent = $('#next-event', $events);
-                            
+
                             GlobalEvents.bind('minuteChanged', self.update);
                             GlobalEvents.bind('roomUpdatedByServer', function(event, room) {
                                 if (room === model.getRoom()) {
@@ -454,9 +454,9 @@ var UI = {
                             function updateEventDOM($eventDOM, event) {
                                 if (event) {
                                     $eventDOM.removeClass('hidden');
-                                    
-                                    var title = event.title || '',
-                                        organizer = event.organizer || '',
+
+                                    var title = event.title || ' ',
+                                        organizer = event.organizer || ' ',
                                         when = event.when;
                                     $eventDOM.children('.title').text(title);
                                     $eventDOM.children('.organizer').text(organizer);
@@ -473,7 +473,7 @@ var UI = {
                                 $container
                                     .removeClass()
                                     .addClass(model.getRoomStatusClassString());
-                                
+
                                 $bookMe.toggleClass('hidden', !!model.getCurrentBooking());
 
                                 updateEventDOM($currentEvent, model.getCurrentBooking());
@@ -488,9 +488,9 @@ var UI = {
                         model,
                         $rooms,
                         $roomsList;
-                    
+
                     function sortRoomList() {
-                    
+
                         var $rooms = $roomsList.children();
                         var roomArray = $.makeArray($rooms.detach());
                             roomArray.sort(function(a, b) {
@@ -498,11 +498,11 @@ var UI = {
                             });
                         $(roomArray).appendTo($roomsList);
                     }
-                    
+
                     return self = {
                         name : 'rooms',
                         enter : function() {
-                            $body.removeClass().addClass("show-rooms");             
+                            $body.removeClass().addClass("show-rooms");
                             $rooms.fadeIn('slow',function(){
                                 $close.toggleClass('hidden', !thisRoom);
                                 $rooms.css('display', '');
@@ -576,7 +576,7 @@ var UI = {
                         $timeMore,
                         $timeLess,
                         $freeAt;
-                        
+
                         function onTimeRequiredClicked(e) {
                             if (!$timeRequired.hasClass('disabled')) {
                                 var bookingRoom = model.getBookingRoom(),
@@ -591,7 +591,7 @@ var UI = {
                                         var onComplete = function() {
                                             GlobalEvents.unbind('roomUpdatedByServer', onSuccess);
                                             GlobalEvents.unbind('bookingFailure', onFailure);
-                                            
+
                                             switchTo(thisRoom ? Status : RoomList);
                                             $timeRequired.dequeue();
                                         }, onSuccess = function (event, room) {
@@ -622,7 +622,7 @@ var UI = {
                                 $timeMore.toggleClass('disabled', !model.canAddTime());
                                 $timeLess.toggleClass('disabled', !model.canSubtractTime());
                             }
-                            
+
                             return false;
                         }
                         function onLessTimeClicked(e) {
@@ -631,10 +631,10 @@ var UI = {
                                 $timeMore.toggleClass('disabled', !model.canAddTime());
                                 $timeLess.toggleClass('disabled', !model.canSubtractTime());
                             }
-                            
+
                             return false;
                         }
-                        
+
                     return self = {
                         name : 'book',
                         enter : function() {
@@ -655,7 +655,7 @@ var UI = {
                         },
                         init : function($root) {
                             model = ViewModels.bookingData;
-                            
+
                             GlobalEvents.bind('minuteChanged', function() {
                                 if (model.getBookingRoom()) {
                                     model.updateTimes();
@@ -664,9 +664,9 @@ var UI = {
                                     $freeAt.text(model.getTimeFreeAtString());
                                 }
                             });
-                            
+
                             $booking = $root;
-                            
+
                             $timeAvailable = $('#info .time-available', $root);
                             $timeRequired = $("#time-required", $root);
                             $timeMore = $("#time-more", $root);
@@ -692,7 +692,7 @@ var UI = {
                     };
                 })(),
                 Switching = {};
-            
+
             return {
                 init : function(thisRoom) {
                     Book.init($('#booking'));
@@ -706,7 +706,7 @@ var UI = {
                 }
             };
         })();
-        
+
         // By setting the font-size to 1/100th of the body height,
         // we can use rem as a ghetto-vh. So 100rem means 100% of the body height
         // and we can write all our sizes in terms of the viewport height.
@@ -760,7 +760,7 @@ var UI = {
                         date : endEnabled
                     };
                 } else {
-                    
+
                     if (!enabledDays.length) {
                         return null;
                     }
@@ -812,7 +812,7 @@ var UI = {
 
                     function onEvent() {
                         var now = DebugSettings.now() || new Date();
-                        
+
                         if (isIdle) {
                             $body.toggleClass('disabled', !shouldEnable(now));
                         }
