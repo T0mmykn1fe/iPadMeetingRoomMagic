@@ -2,9 +2,9 @@
 
 ##What It Is
 
-MEAT is meant to be displayed outside your meeting rooms on any device with a 
+MEAT is meant to be displayed outside your meeting rooms on any device with a
 modern web browser (we use iPads, but you can use netbooks, phones, or whatever).
-If you're signed up with Google Apps, MEAT will display status for all your 
+If you're signed up with Google Apps, MEAT will display status for all your
 meeting rooms and allow you to book time on the spot.
 
 ##Quick Start
@@ -72,7 +72,7 @@ Room displays should hit:
 
     http://example.com?room={roomName}
 
-Where {roomName} is the full, case-sensitive, URL-encoded name of the room 
+Where {roomName} is the full, case-sensitive, URL-encoded name of the room
 they're in front of.
 
 But, if you don't want to type the full, case-sensitive, URL-encoded name of the room,
@@ -80,7 +80,7 @@ you can also hit the following URL and select the room from a list at:
 
     http://example.com/setup/links
 
-If you'd like to have a display show information for all rooms by default, 
+If you'd like to have a display show information for all rooms by default,
 then just hit:
 
     http://example.com/
@@ -103,6 +103,8 @@ Note: there is little to no security in MEAT. If your Google Apps information ne
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](https://github.com/cowboy/grunt).
 
 ## Release History
+
+* 0.3.4 - Google+ changes cause displayName to now be missing sometimes. So thanks to Hai Vu we fallback to an email (minus domain). We also fallback to 'None' now if there is no organizer at all or if we couldn't parse the email correctly (or it wasn't provided).
 * 0.3.3 - Increase max rooms from 100 to 250 (the max) for larger offices. Will eventually need to start making paged requests.
 * 0.3.2 - Fix LICENSE link in package.json
 * 0.3.1 - Set preferGlobal
@@ -121,5 +123,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 3. If there is demand, I would like to expand MEAT outside of google Apps to work with Microsoft Exchange, or whatever other calendar software people are using.
 
 ## License
-Copyright (c) 2012 Adam Ahmed  
+Copyright (c) 2012 Adam Ahmed
 Licensed under the MIT Expat license.
