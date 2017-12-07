@@ -3,25 +3,16 @@
   "description": "Meeting room kiosk app for displaying meeting room schedules and booking rooms in your organization. Built against Google Apps, but other sources can be defined.",
   "version": "0.3.4",
   "preferGlobal": true,
-  "homepage": "https://bitbucket.org/aahmed/meat",
   "author": {
-    "name": "Adam Ahmed",
-    "email": "aahmed@atlassian.com",
-    "url": "http://www.noiregrets.com"
+    "name": "T0mmyKn1fe",
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/aahmed/meat.git"
+    "url": "https://github.com/T0mmykn1fe/iPadMeetingRoomMagic"
   },
   "bugs": {
-    "url": "https://bitbucket.org/aahmed/meat/issues"
+    "url": "https://github.com/T0mmykn1fe/iPadMeetingRoomMagic/issues"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://bitbucket.org/aahmed/meat/src/HEAD/LICENSE-MIT?at=master"
-    }
-  ],
   "bin": {
     "meat": "bin/meat"
   },
